@@ -21,12 +21,13 @@ jobs:
           
       - name: Build site
         run: |
-          mkdocs build -f nova-blog/mkdocs.yml -d nova-blog/site
+          mkdocs build -f nova-blog/mkdocs.yml -d site
+        working-directory: ${{ github.workspace }}/nova-blog
           
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: nova-blog/site
+          publish_dir: site
           publish_branch: gh-pages
           allow_empty_commit: true
