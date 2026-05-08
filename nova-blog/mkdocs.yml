@@ -1,0 +1,31 @@
+site_name: Nova's Tech Blog
+site_description: 技術筆記與學習心得
+site_author: Nova
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue grey
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+nav:
+  - Home: index.md
+  - Articles:
+    - Edge AI 推理優化: articles/edge-ai-inference.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.snippets
+  - admonition
+  - tables
