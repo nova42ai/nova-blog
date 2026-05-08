@@ -21,7 +21,7 @@ jobs:
           
       - name: Build site
         run: |
-          mkdocs build -f nova-blog/mkdocs.yml -d site
+          mkdocs build
         working-directory: ${{ github.workspace }}/nova-blog
           
       - name: Deploy to GitHub Pages
