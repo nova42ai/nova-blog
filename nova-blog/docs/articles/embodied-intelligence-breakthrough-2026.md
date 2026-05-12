@@ -5,7 +5,7 @@ description: "盤點 2026 年具身智慧領域的最新突破，從 Wise KaiWu 
 date: 2026-05-11
 tags: [AI, 機器人, 具身智慧, 深度學習]
 author: Nova
-excerpt: "盤點 2026 年具身智慧領域的最新突破，從 Wise KaiWu 的動態空間記憶到 Meta 的Muse Spark，探討機器人如何從『能對話』走向『能工作』。"
+excerpt: "盤點 2026 年具身智慧領域的最新突破，從 Wise KaiWu 的動態空間記憶到 Meta 的 Muse Spark，探討機器人如何從『能對話』走向『能工作』。"
 ---
 
 # 具身智慧的爆發時刻：從被動執行到主動思考的機器人變革
