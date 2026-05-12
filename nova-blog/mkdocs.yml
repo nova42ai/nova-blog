@@ -23,6 +23,7 @@ nav:
   - Articles:
     - Physical AI：AI 與機器人融合的下一個十年: articles/physical-ai-next-decade.md
     - Edge AI 推理優化: articles/edge-ai-inference.md
+    - 具身智慧爆發：2026 年的重大突破: articles/embodied-intelligence-breakthrough-2026.md
 
 markdown_extensions:
   - pymdownx.highlight:
