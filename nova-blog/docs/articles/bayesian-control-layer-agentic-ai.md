@@ -12,15 +12,7 @@ category: AI & Robotics
 
 > **當多個 Agent 需要協作、當規劃步驟跨越數十個 Tool、當失敗需要被及時catch並重試——「調度邏輯」本身的設計就成了系統穩定性的最大變數。**
 
-這不只是「加個 if-else」的問題。傳統的 Rule-based orchestration 無法處理資訊不確定性，也難以在任務中途動態調整優先級。於是 2026 年的前沿研究開始往一個方向收斂：
-
-**Bayesian Control Layer for Agentic Systems（貝葉斯控制層）**
-
----
-
-## 什麼是 Agentic Orchestration？
-
-在深入貝葉斯層之前，先快速定位這個概念。
+這不只是「加個 if-else」的問題。傳統的 Rule-based orchestration 無法處理資訊不確定性，也難以在任務中途動態調整優先級。於是 2026 年的前沿研究開始往一個方向收斂：**Bayesian Control Layer for Agentic Systems（貝葉斯控制層）**。
 
 所謂 **Agentic AI**，指的是具備以下能力的 AI 系統：
 - **自主規劃**（Planning）：將高層目標拆解為可執行步驟
@@ -39,10 +31,6 @@ category: AI & Robotics
 
 這些方法的共同缺陷：**不處理「資訊價值」的概念**。
 
----
-
-## 貝葉斯控制層的核心思想
-
 2026 年 5 月初，一篇 arXiv 論文（arXiv:2605.00742）提出了系統性的框架，核心概念是：
 
 ### Value of Information（VoI）- 資訊價值驅動調度
@@ -59,9 +47,9 @@ Expected Value of Action = Σ (P(outcome_i) × Utility(outcome_i)) / Cost(action
 
 ### Posterior Update — 後驗更新機制
 
-每次 Tool 返回結果，系統會更新其對任務狀態的信念（Belief），類似於：
+每次 Tool 返回結果，系統會更新其對任務狀態的信念（Belief），類似於貝葉斯公式：
 
-```python
+```
 P(H | E) = P(E | H) × P(H) / P(E)
 ```
 
@@ -138,17 +126,17 @@ VoI(action) = Expected_Utility(action) - Expected_Utility(do_nothing)
 
 沒有完美的框架，貝葉斯控制層也有其瓶頸：
 
-### 1. 計算成本
+### 規格仍在演化
 
-每個調度節點都要做貝葉斯更新，這在超高頻場景（如高頻交易）可能造成延遲瓶頸。需要持續優化近似演算法（如 Variational Inference、Particle Filters）。
+MCP 和 A2A 的規範都不是 1.0 版本。功能集合、錯誤處理機制、安全模型都在持續更新。現在投入生產系統有「規範變動」的維護成本。
 
-### 2. Prior 的建構
+### 企業級安全模型尚不成熟
 
-貝葉斯方法依賴良好的先驗分布。在沒有領域知識的情況下，先驗可能是 flat（均勻分布），導致系統一開始幾乎退化為均勻隨機探索。
+MCP 目前支援基本的 permission scope，但**跨組織的 Agent 認證、數據主權審計、端到端加密**還沒有標準化的解決方案。這對金融、醫療等高度監管產業是實實在在的阻礙。
 
-### 3. 與 LLM 機率輸出的整合
+### 生態系統碎片化仍在
 
-LLM 的輸出本身是機率性的（logits），但這些 logprob 是否直接映射為「任務成功的置信度」？目前學界還沒有定論。這是個開放的研究問題。
+不是所有框架都支援 MCP/A2A。許多雲端 AI 平台（AWS Bedrock、Google Vertex AI）還在用自家的專屬整合方式。標準化的價值在於網路效應——**在多數主流平台支援之前，效益有限**。
 
 ---
 
