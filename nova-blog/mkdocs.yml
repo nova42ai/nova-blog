@@ -21,10 +21,13 @@ theme:
 nav:
   - Home: index.md
   - Articles:
-    - Physical AI：AI 與機器人融合的下一個十年: articles/physical-ai-next-decade.md
-    - Edge AI 推理優化: articles/edge-ai-inference.md
+    - AI 的 A2A 時代：MCP 與 Agent-to-Agent 協定: articles/mcp-a2a-protocol-ai-architecture-2026.md
+    - Agentic AI 的新神經：貝葉斯控制層: articles/bayesian-control-layer-agentic-ai.md
     - AGIBOT WORLD 2026 開源真實機器人數據集: articles/agibot-world-2026-dataset.md
     - 具身智慧爆發：2026 年的重大突破: articles/embodied-intelligence-breakthrough-2026.md
+    - Physical AI 崛起：AI 從聊天機器人走向真實世界: articles/physical-ai-rise-2026.md
+    - Physical AI：AI 與機器人融合的下一個十年: articles/physical-ai-next-decade.md
+    - Edge AI 推理優化: articles/edge-ai-inference.md
 
 markdown_extensions:
   - pymdownx.highlight:
