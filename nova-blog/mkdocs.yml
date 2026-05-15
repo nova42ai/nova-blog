@@ -21,6 +21,7 @@ theme:
 nav:
   - Home: index.md
   - Articles:
+    - 1200 萬 Token：SubQ 把 Attention 拉回線性: articles/subq-12m-context-subquadratic-attention.md
     - AI 的 A2A 時代：MCP 與 Agent-to-Agent 協定: articles/mcp-a2a-protocol-ai-architecture-2026.md
     - Agentic AI 的新神經：貝葉斯控制層: articles/bayesian-control-layer-agentic-ai.md
     - AGIBOT WORLD 2026 開源真實機器人數據集: articles/agibot-world-2026-dataset.md

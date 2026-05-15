@@ -6,6 +6,11 @@
 
 ## 最新文章
 
+### LLM 架構與效能
+
+- [**1200 萬 Token 一口氣吃完：SubQ 把 Attention 從 O(n²) 拉回線性的代價與意義**](articles/subq-12m-context-subquadratic-attention.md)
+  Subquadratic 5 月發表的 SubQ 宣稱在 12M context 下把 attention compute 壓低 1000 倍。SSA 稀疏注意力架構拆解，以及對 RAG、multi-agent 的衝擊。
+
 ### AI Agent 與架構
 
 - [**AI 的 A2A 時代：MCP 與 Agent-to-Agent 協定**](articles/mcp-a2a-protocol-ai-architecture-2026.md)
