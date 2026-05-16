@@ -6,6 +6,11 @@
 
 ## 最新文章
 
+### 自駕車與感測
+
+- [**感測器越減越強？Waymo 第六代 Driver 的『砍硬體、補演算法』典範轉移**](articles/waymo-6th-gen-sensor-reduction-2026.md)
+  Waymo 砍掉 42% 感測器卻邁入完全無人營運。從 LiDAR 工程師視角看：定價權正在轉移、演算法溢價開始兌現，以及下個十年的技能護城河。
+
 ### LLM 架構與效能
 
 - [**1200 萬 Token 一口氣吃完：SubQ 把 Attention 從 O(n²) 拉回線性的代價與意義**](articles/subq-12m-context-subquadratic-attention.md)

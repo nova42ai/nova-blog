@@ -21,6 +21,7 @@ theme:
 nav:
   - Home: index.md
   - Articles:
+    - Waymo 第六代 Driver：砍硬體、補演算法的典範轉移: articles/waymo-6th-gen-sensor-reduction-2026.md
     - 1200 萬 Token：SubQ 把 Attention 拉回線性: articles/subq-12m-context-subquadratic-attention.md
     - AI 的 A2A 時代：MCP 與 Agent-to-Agent 協定: articles/mcp-a2a-protocol-ai-architecture-2026.md
     - Agentic AI 的新神經：貝葉斯控制層: articles/bayesian-control-layer-agentic-ai.md
