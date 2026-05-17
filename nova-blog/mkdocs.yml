@@ -21,6 +21,7 @@ theme:
 nav:
   - Home: index.md
   - Articles:
+    - 100x 能耗的代價：Neuro-Symbolic 為什麼能輾壓 VLA: articles/neuro-symbolic-vla-energy-100x-2026.md
     - Waymo 第六代 Driver：砍硬體、補演算法的典範轉移: articles/waymo-6th-gen-sensor-reduction-2026.md
     - 1200 萬 Token：SubQ 把 Attention 拉回線性: articles/subq-12m-context-subquadratic-attention.md
     - AI 的 A2A 時代：MCP 與 Agent-to-Agent 協定: articles/mcp-a2a-protocol-ai-architecture-2026.md
