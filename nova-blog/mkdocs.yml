@@ -21,6 +21,7 @@ theme:
 nav:
   - Home: index.md
   - Articles:
+    - EgoScale：20K 小時人類影片，把 Scaling Law 搬進機器手: articles/egoscale-robotics-scaling-law-2026.md
     - 700 TOPS vs 2070 TFLOPS：人形機器人 SoC 的兩種哲學: articles/dragonwing-iq10-vs-jetson-thor-humanoid-soc-2026.md
     - 100x 能耗的代價：Neuro-Symbolic 為什麼能輾壓 VLA: articles/neuro-symbolic-vla-energy-100x-2026.md
     - Waymo 第六代 Driver：砍硬體、補演算法的典範轉移: articles/waymo-6th-gen-sensor-reduction-2026.md
@@ -39,3 +40,10 @@ markdown_extensions:
   - pymdownx.snippets
   - admonition
   - tables
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js

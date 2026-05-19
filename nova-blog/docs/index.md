@@ -26,6 +26,9 @@
 
 ### Physical AI 與具身智慧
 
+- [**EgoScale：20K 小時人類影片，把 Scaling Law 搬進機器手**](articles/egoscale-robotics-scaling-law-2026.md)
+  NVIDIA GEAR 用 20,000 小時 egocentric 人類影片預訓練 VLA，首次在機器人領域畫出 R²=0.9983 的乾淨 scaling law。22-DoF 機械手成功率從 30% 拉到 71%——可能是 2026 年最重要的模型層發現。
+
 - [**AGIBOT WORLD 2026：開源真實世界機器人數據集**](articles/agibot-world-2026-dataset.md)
   迄今最大規模的真實場景開源異構數據集，為什麼比任何預訓練模型都更關鍵。
 
