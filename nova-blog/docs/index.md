@@ -8,6 +8,9 @@
 
 ### 自駕車與感測
 
+- [**感知下沉到感測器：On-Sensor Perception 正在改寫 LiDAR 的算力地圖**](articles/on-sensor-perception-lidar-edge-2026.md)
+  Innoviz 簽下 on-sensor perception 開發協議、Ouster Rev8 用 L4 矽晶直接吐彩色點雲——感知運算正從中央 SoC 往感測器邊緣下沉。拆解 in/near/on-sensor 的差別，以及它對 sensor fusion 與延遲預算的真實衝擊。
+
 - [**感測器越減越強？Waymo 第六代 Driver 的『砍硬體、補演算法』典範轉移**](articles/waymo-6th-gen-sensor-reduction-2026.md)
   Waymo 砍掉 42% 感測器卻邁入完全無人營運。從 LiDAR 工程師視角看：定價權正在轉移、演算法溢價開始兌現，以及下個十年的技能護城河。
 
@@ -26,6 +29,12 @@
 
 ### Physical AI 與具身智慧
 
+- [**Sim-to-Real 的最後一哩路：當多物理模擬遇上世界模型**](articles/sim-to-real-gap-cadence-nvidia-2026.md)
+  Cadence 與 NVIDIA 擴大合作，把高保真多物理模擬塞進 Isaac + Cosmos 訓練迴圈。但 RTX 渲染再逼真，接觸密集任務還是掉 20-40%。拆解為什麼 Sim-to-Real 至今沒有銀彈，以及 2026 年真正可行的工程配方。
+
+- [**100x 能耗的代價：Neuro-Symbolic 為什麼能在結構化操作任務上輾壓 VLA**](articles/neuro-symbolic-vla-energy-100x-2026.md)
+  Tufts 在 ICRA 2026 的『The Price Is Not Right』論文，用 1% 訓練能耗、95% 成功率把當紅的 VLA 模型打回原形。這不是復古情懷，是工程理性的回擊。
+
 - [**EgoScale：20K 小時人類影片，把 Scaling Law 搬進機器手**](articles/egoscale-robotics-scaling-law-2026.md)
   NVIDIA GEAR 用 20,000 小時 egocentric 人類影片預訓練 VLA，首次在機器人領域畫出 R²=0.9983 的乾淨 scaling law。22-DoF 機械手成功率從 30% 拉到 71%——可能是 2026 年最重要的模型層發現。
 
@@ -42,6 +51,9 @@
   AI 與機器人融合的十年路線圖：感知、決策、執行三層的演進。
 
 ### 邊緣運算
+
+- [**700 TOPS vs 2070 TFLOPS：人形機器人 SoC 的兩種哲學**](articles/dragonwing-iq10-vs-jetson-thor-humanoid-soc-2026.md)
+  Qualcomm Dragonwing IQ10 以 Figure AI 為首發客戶，切入 NVIDIA Jetson 獨佔的市場。一邊賣峰值算力、一邊賣能效續航——人形機器人『大腦』之爭，比規格表更深的是兩種架構哲學。
 
 - [**邊緣 AI 推理優化：從理論到實踐**](articles/edge-ai-inference.md)
   在嵌入式系統執行 AI 模型，如何在延遲、功耗、準確度之間取得平衡——量化、剪枝、知識蒸餾的實戰整理。
