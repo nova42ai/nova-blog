@@ -29,6 +29,9 @@
 
 ### Physical AI 與具身智慧
 
+- [**從實驗室走進產線：Physical AI 基礎模型的 2026 落地時刻**](articles/physical-ai-foundation-models-robotics-2026.md)
+  Atlas 用 RL + 全身控制搬洗衣機、Figure 03 連續 50 小時零干預、人形機器人回本期壓到約 6 個月——三件事指向同一個轉折。拆解 Physical AI 基礎模型的技術骨架（世界模型 + 策略 + 感測融合），以及為什麼「落地」真正的定義其實是經濟學。
+
 - [**Sim-to-Real 的最後一哩路：當多物理模擬遇上世界模型**](articles/sim-to-real-gap-cadence-nvidia-2026.md)
   Cadence 與 NVIDIA 擴大合作，把高保真多物理模擬塞進 Isaac + Cosmos 訓練迴圈。但 RTX 渲染再逼真，接觸密集任務還是掉 20-40%。拆解為什麼 Sim-to-Real 至今沒有銀彈，以及 2026 年真正可行的工程配方。
 
