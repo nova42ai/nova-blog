@@ -29,6 +29,9 @@
 
 ### Physical AI 與具身智慧
 
+- [**20.2 毫秒的閉環：Sony Ace 桌球機器人，把 Physical AI 重新定義成『延遲預算』問題**](articles/sony-ace-realtime-perception-control-2026.md)
+  Sony AI 的 Project Ace 登上 Nature 封面——但真正的訊號不是「機器人打贏人類」，而是那條 20.2 毫秒的感知-擊球閉環。拆解事件相機 + 幀相機的異質感測融合、Skill/Tactics/Strategy 三層即時控制，以及它對自駕、機器人延遲預算的啟示。
+
 - [**從實驗室走進產線：Physical AI 基礎模型的 2026 落地時刻**](articles/physical-ai-foundation-models-robotics-2026.md)
   Atlas 用 RL + 全身控制搬洗衣機、Figure 03 連續 50 小時零干預、人形機器人回本期壓到約 6 個月——三件事指向同一個轉折。拆解 Physical AI 基礎模型的技術骨架（世界模型 + 策略 + 感測融合），以及為什麼「落地」真正的定義其實是經濟學。
 
