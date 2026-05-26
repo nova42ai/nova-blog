@@ -21,6 +21,9 @@ theme:
 nav:
   - Home: index.md
   - Articles:
+    - 當 LiDAR 在霧裡失明：4D 雷達融合如何撐起全天候感知: articles/lidar-4dradar-fusion-all-weather-perception-2026.md
+    - Demo 裡能跑，產線上會死：機器人策略的「部署時可靠性」: articles/deployment-time-reliability-runtime-failure-detection-2026.md
+    - 當模擬器自己學會做夢：World Models 如何重寫機器人學習的資料賬本: articles/world-models-robot-learning-learned-simulators-2026.md
     - 20.2 毫秒的閉環：Sony Ace 桌球機器人與延遲預算: articles/sony-ace-realtime-perception-control-2026.md
     - 從實驗室走進產線：Physical AI 基礎模型的 2026 落地時刻: articles/physical-ai-foundation-models-robotics-2026.md
     - 感知下沉到感測器：On-Sensor Perception 改寫 LiDAR 算力地圖: articles/on-sensor-perception-lidar-edge-2026.md
