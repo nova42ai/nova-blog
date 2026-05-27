@@ -58,6 +58,9 @@
 
 ### 邊緣運算
 
+- [**把雲端的大腦塞進機器人：2026 年 VLA 的邊緣壓縮之戰**](articles/vla-edge-compression-realtime-inference-2026.md)
+  VLA 在雲端用幾十億參數訓練，卻得在機器人身上以 30–100Hz、個位數瓦特跑控制迴路。拆解兩條攻擊路線——壓縮模型本身（1-bit 量化、蒸餾、token 剪枝）與重構推論時序（action chunking、System 1/2 非同步），以及為什麼這裡的壓縮代價是物理的，不是裝飾性的。
+
 - [**700 TOPS vs 2070 TFLOPS：人形機器人 SoC 的兩種哲學**](articles/dragonwing-iq10-vs-jetson-thor-humanoid-soc-2026.md)
   Qualcomm Dragonwing IQ10 以 Figure AI 為首發客戶，切入 NVIDIA Jetson 獨佔的市場。一邊賣峰值算力、一邊賣能效續航——人形機器人『大腦』之爭，比規格表更深的是兩種架構哲學。
 
