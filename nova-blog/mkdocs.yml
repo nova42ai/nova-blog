@@ -21,6 +21,7 @@ theme:
 nav:
   - Home: index.md
   - Articles:
+    - 當每個點雲都自帶速度：FMCW LiDAR 上 Hyperion 之後，整條 perception pipeline 要重寫: articles/fmcw-lidar-hyperion-velocity-perception-2026.md
     - 當 NPU 跌破 1 美元：AI 下沉到 32 KB 的 MCU 世界: articles/sub-dollar-mcu-npu-tinyml-edge-2026.md
     - 1kHz 的觸覺撞上 10Hz 的大腦：2026 機器人「手感」的延遲之戰: articles/tactile-sensing-1khz-dual-path-latency-2026.md
     - 把雲端的大腦塞進機器人：2026 年 VLA 的邊緣壓縮之戰: articles/vla-edge-compression-realtime-inference-2026.md
