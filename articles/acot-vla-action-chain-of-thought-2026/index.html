@@ -1,0 +1,2363 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Agibot 在 CVPR 2026 提出的 ACoT-VLA，繞開了 CoT-VLA「說得多、跑得慢」的死結。它不用語言推理、不畫想像圖，而是讓模型直接在動作空間裡 deliberate。LIBERO 98.5%、LIBERO-Plus 88% 的數字背後，是一條值得長期關注的技術路徑。">
+      
+      
+        <meta name="author" content="Nova">
+      
+      
+      
+        <link rel="prev" href="../groot-n16-dual-system-cosmos-reason-2026/">
+      
+      
+        <link rel="next" href="../china-data-pipeline-vla-architecture-2026/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>ACoT-VLA：把「思考」直接塞進動作空間，CVPR 2026 給 VLA 推理路線換了根骨頭 - Nova's Tech Blog</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#vla" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Nova&#39;s Tech Blog" class="md-header__button md-logo" aria-label="Nova's Tech Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Nova's Tech Blog
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ACoT-VLA：把「思考」直接塞進動作空間，CVPR 2026 給 VLA 推理路線換了根骨頭
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Nova&#39;s Tech Blog" class="md-nav__button md-logo" aria-label="Nova's Tech Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Nova's Tech Blog
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    自駕車與感測
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    自駕車與感測
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../on-sensor-perception-lidar-edge-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    感知下沉到感測器：On-Sensor Perception 改寫 LiDAR 算力地圖
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fmcw-lidar-hyperion-velocity-perception-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當每個點雲都自帶速度：FMCW LiDAR 上 Hyperion 之後
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lidar-4dradar-fusion-all-weather-perception-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當 LiDAR 在霧裡失明：4D 雷達融合如何撐起全天候感知
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../waymo-6th-gen-sensor-reduction-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waymo 第六代 Driver：砍硬體、補演算法的典範轉移
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM 架構與效能
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    LLM 架構與效能
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../subq-12m-context-subquadratic-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1200 萬 Token：SubQ 把 Attention 拉回線性
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Agent 與架構
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Agent 與架構
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mcp-a2a-protocol-ai-architecture-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI 的 A2A 時代：MCP 與 Agent-to-Agent 協定
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bayesian-control-layer-agentic-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic AI 的新神經：貝葉斯控制層
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI 與具身智慧
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Physical AI 與具身智慧
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sony-ace-realtime-perception-control-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20.2 毫秒的閉環：Sony Ace 桌球機器人與延遲預算
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-foundation-models-robotics-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    從實驗室走進產線：Physical AI 基礎模型的 2026 落地時刻
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../figure02-bmw-1250hours-forearm-humanoid-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1,250 小時換來的一件事：humanoid 想商用化，瓶頸卡在手腕
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-time-reliability-runtime-failure-detection-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo 裡能跑，產線上會死：機器人策略的「部署時可靠性」
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tactile-sensing-1khz-dual-path-latency-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1kHz 的觸覺撞上 10Hz 的大腦：2026 機器人「手感」的延遲之戰
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../embodied-intelligence-breakthrough-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    具身智慧爆發：2026 年的重大突破
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-rise-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI 崛起：AI 從聊天機器人走向真實世界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-next-decade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI：AI 與機器人融合的下一個十年
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VLA 與機器人學習
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VLA 與機器人學習
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../groot-n16-dual-system-cosmos-reason-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GR00T N1.6 雙系統架構：NVIDIA 把 Cosmos Reason 2 塞進人形機器人
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ACoT-VLA：把「思考」直接塞進動作空間
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ACoT-VLA：把「思考」直接塞進動作空間
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#vla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前言：VLA 的「會說不會做」
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cot-vla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        為什麼 CoT-VLA 走進了死胡同
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="為什麼 CoT-VLA 走進了死胡同">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cotembodied-cot-ecot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        路線一：純語言 CoT（Embodied CoT, ECoT）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cotcot-vla-cvpr-2025" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        路線二：視覺 CoT（CoT-VLA, CVPR 2025）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        共同的根本問題
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acot-vla-reasoner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ACoT-VLA：兩個 Reasoner，一條捷徑
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ACoT-VLA：兩個 Reasoner，一條捷徑">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-explicit-action-reasonerear" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Explicit Action Reasoner（EAR）：粗粒度軌跡規劃
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-implicit-action-reasoneriarlatent-action-prior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Implicit Action Reasoner（IAR）：latent action prior
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        架構對比
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#baseline-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        數據：不是「打贏 baseline」，是「重新定義 baseline」
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="數據：不是「打贏 baseline」，是「重新定義 baseline」">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#libero" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LIBERO 基準測試
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#libero-plus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LIBERO-Plus：分布外才見真章
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vlabench" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VLABench：複合場景
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        為什麼這篇值得長期追蹤
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="為什麼這篇值得長期追蹤">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-cot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 它把 CoT 從「語言主義」拉了出來
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-cot-vla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 它讓 CoT-VLA 真正有機會跑在邊緣設備上
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-agibot-vla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 它替 Agibot 在 VLA 學術圈卡了個位
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        工程啟示：選對推理介質，比堆參數更划算
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        延伸閱讀
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../china-data-pipeline-vla-architecture-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    資料工廠倒逼演算法：中國 50 萬人的 egocentric pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../egoscale-robotics-scaling-law-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EgoScale：20K 小時人類影片，把 Scaling Law 搬進機器手
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../neuro-symbolic-vla-energy-100x-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    100x 能耗的代價：Neuro-Symbolic 為什麼能輾壓 VLA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agibot-world-2026-dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AGIBOT WORLD 2026 開源真實機器人數據集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    世界模型與 Sim-to-Real
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    世界模型與 Sim-to-Real
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../world-models-imagination-layer-robotics-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    讓機器人先想再做：2026 年世界模型成為機器人的「想像層」
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../world-models-robot-learning-learned-simulators-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當模擬器自己學會做夢：World Models 重寫機器人學習的資料賬本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sim-to-real-gap-cadence-nvidia-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim-to-Real 的最後一哩路：當多物理模擬遇上世界模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    邊緣運算與機器人 SoC
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    邊緣運算與機器人 SoC
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vla-edge-compression-realtime-inference-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    把雲端的大腦塞進機器人：2026 年 VLA 的邊緣壓縮之戰
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dragonwing-iq10-vs-jetson-thor-humanoid-soc-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    700 TOPS vs 2070 TFLOPS：人形機器人 SoC 的兩種哲學
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-dollar-mcu-npu-tinyml-edge-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當 NPU 跌破 1 美元：AI 下沉到 32 KB 的 MCU 世界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../edge-ai-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    邊緣 AI 推理優化：從理論到實踐
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    機器人系統與框架
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    機器人系統與框架
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ros2-gpu-aware-nitros-physical-ai-sig-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS 2 終於要 GPU-aware：NITROS、Greenwave Monitor 與 Physical AI SIG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ros2-llm-behavior-tree-latency-asymmetry-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS2 + LLM：延遲不對稱的接縫——behavior tree 是被低估的中介層
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#vla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前言：VLA 的「會說不會做」
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cot-vla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        為什麼 CoT-VLA 走進了死胡同
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="為什麼 CoT-VLA 走進了死胡同">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cotembodied-cot-ecot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        路線一：純語言 CoT（Embodied CoT, ECoT）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cotcot-vla-cvpr-2025" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        路線二：視覺 CoT（CoT-VLA, CVPR 2025）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        共同的根本問題
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#acot-vla-reasoner" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ACoT-VLA：兩個 Reasoner，一條捷徑
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ACoT-VLA：兩個 Reasoner，一條捷徑">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-explicit-action-reasonerear" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Explicit Action Reasoner（EAR）：粗粒度軌跡規劃
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-implicit-action-reasoneriarlatent-action-prior" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Implicit Action Reasoner（IAR）：latent action prior
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        架構對比
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#baseline-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        數據：不是「打贏 baseline」，是「重新定義 baseline」
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="數據：不是「打贏 baseline」，是「重新定義 baseline」">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#libero" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LIBERO 基準測試
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#libero-plus" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LIBERO-Plus：分布外才見真章
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vlabench" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VLABench：複合場景
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        為什麼這篇值得長期追蹤
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="為什麼這篇值得長期追蹤">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-cot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 它把 CoT 從「語言主義」拉了出來
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-cot-vla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 它讓 CoT-VLA 真正有機會跑在邊緣設備上
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-agibot-vla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 它替 Agibot 在 VLA 學術圈卡了個位
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        工程啟示：選對推理介質，比堆參數更划算
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        延伸閱讀
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>ACoT-VLA：把「思考」直接塞進動作空間</h1>
+
+<h2 id="vla">前言：VLA 的「會說不會做」</h2>
+<p>過去一年，Vision-Language-Action（VLA）模型最尷尬的瓶頸不是規模，是<strong>推理</strong>。</p>
+<p>把 LLM 那套 Chain-of-Thought 搬到機器人身上，看起來理所當然——讓模型先「想一想」再動手，總比直接 reflex 來得穩。但實際跑起來，每個從業者都會撞上同一道牆：</p>
+<blockquote>
+<p><strong>講得頭頭是道的 CoT-VLA，控制頻率掉到 1–5 Hz，根本無法駕馭真實機器人。</strong></p>
+</blockquote>
+<p>一台人形機器人手臂的穩定控制至少需要 20–50 Hz，動態任務甚至要到 100 Hz。當你的「思考」每秒只能輸出一次決策，那不是智慧，是癱瘓。</p>
+<p>2026 年 6 月，Agibot 與相關研究團隊在 CVPR 2026 發表的 <strong>ACoT-VLA: Action Chain-of-Thought for Vision-Language-Action Models</strong> 給了一個漂亮的答案：<strong>不要在語言裡推理，直接在動作空間推理</strong>。</p>
+<p>這篇論文在 LIBERO 拿下 98.5% 的平均成功率、在 LIBERO-Plus 分布外測試拿到 86.6%（zero-shot）／88.0%（SFT）。數字之外，它真正改變的是 VLA 推理路線的工程預設。</p>
+<hr />
+<h2 id="cot-vla">為什麼 CoT-VLA 走進了死胡同</h2>
+<p>要理解 ACoT-VLA 在解什麼問題，得先看清前一代 CoT-VLA 的結構性缺陷。</p>
+<h3 id="cotembodied-cot-ecot">路線一：純語言 CoT（Embodied CoT, ECoT）</h3>
+<p>代表作 RT-2 的延伸與 ECoT 系列。做法是讓模型先用自然語言寫一串推理：</p>
+<blockquote>
+<p>「我看到桌上有一個藍色杯子，使用者要我把它放到右邊架子上。<br />
+第一步：用右手抓住杯柄。<br />
+第二步：抬高 10 公分避免碰到水壺……」</p>
+</blockquote>
+<p>優點：可解釋、好除錯。<br />
+致命缺點：<strong>每個 token 都要過一次大模型解碼</strong>。在 7B 級 VLA 上，一段 200 token 的推理就吃掉幾百毫秒；組合起來控制頻率只有 1 Hz，連端茶倒水都來不及。</p>
+<h3 id="cotcot-vla-cvpr-2025">路線二：視覺 CoT（CoT-VLA, CVPR 2025）</h3>
+<p>把推理從文字換成「想像中的目標影像」（goal image synthesis），模型先生成下一步應該長什麼樣子，再從這張想像圖反推動作。</p>
+<p>優點：跳過了文字 token 的瓶頸。<br />
+缺點：<strong>生圖更慢</strong>。Diffusion-based 的視覺 CoT 在 H100 上一次推理都要數百毫秒，跑在機器人邊緣設備上根本是奢侈品。而且，視覺 CoT 提供的訊號是「目標長相」，但動作層真正需要的是「軌跡」。中間還要再做一次反推。</p>
+<h3 id="_1">共同的根本問題</h3>
+<p>兩條路線的真正缺陷是同一件事：<strong>它們在錯誤的空間裡推理</strong>。</p>
+<p>語言空間擅長表達意圖，視覺空間擅長表達結果，<strong>但兩者都不擅長表達「我接下來這 100 毫秒該怎麼動」</strong>。從語意/視覺到動作之間，永遠有一道 grounding 鴻溝。</p>
+<p>ACoT-VLA 的核心洞察很簡單：<strong>如果最終要產出動作，那就讓推理本身也是動作的形式</strong>。</p>
+<hr />
+<h2 id="acot-vla-reasoner">ACoT-VLA：兩個 Reasoner，一條捷徑</h2>
+<p>論文的主架構由兩個互補的推理模組構成，繞過了傳統 CoT 的語言/視覺中介。</p>
+<h3 id="1-explicit-action-reasonerear">1. Explicit Action Reasoner（EAR）：粗粒度軌跡規劃</h3>
+<p>一個輕量的 Transformer，負責輸出<strong>粗粒度的動作軌跡</strong>——不是文字、不是圖像，而是直接的 motion waypoints。</p>
+<p>可以把它理解為：
+- 傳統 CoT：「我要先抬手再放下」（30 個 token）
+- EAR：直接吐出 5 個關鍵 waypoint 的座標序列（30 個 float）</p>
+<p>訊號密度高、解碼成本低，而且<strong>輸出格式天然就是 controller 吃得下的東西</strong>。</p>
+<h3 id="2-implicit-action-reasoneriarlatent-action-prior">2. Implicit Action Reasoner（IAR）：latent action prior</h3>
+<p>從 VLM backbone 的隱藏層用 cross-attention 抽取<strong>潛在的動作先驗</strong>。這部分不顯式輸出任何中間結果，而是把推理結果直接調制（modulate）到下游 action head。</p>
+<p>EAR 提供「我該往哪走」的明牌，IAR 提供「我該怎麼走」的暗牌，兩者融合送進 action decoder。整條 chain-of-thought <strong>從頭到尾都在動作空間裡發生</strong>，不繞語言、不繞影像。</p>
+<h3 id="_2">架構對比</h3>
+<table>
+<thead>
+<tr>
+<th>路線</th>
+<th>推理介質</th>
+<th>解碼成本</th>
+<th>與動作的 grounding</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ECoT（語言）</td>
+<td>文字 token</td>
+<td>高（自回歸）</td>
+<td>弱（要二次轉換）</td>
+</tr>
+<tr>
+<td>CoT-VLA（視覺）</td>
+<td>目標影像</td>
+<td>極高（diffusion）</td>
+<td>中（要從圖反推）</td>
+</tr>
+<tr>
+<td><strong>ACoT-VLA</strong>（動作）</td>
+<td>Waypoints + latent</td>
+<td>低</td>
+<td><strong>強（直接對接）</strong></td>
+</tr>
+</tbody>
+</table>
+<p>這張表是我自己整理的，論文沒有這樣畫，但這是它真正的 contribution 所在。</p>
+<hr />
+<h2 id="baseline-baseline">數據：不是「打贏 baseline」，是「重新定義 baseline」</h2>
+<h3 id="libero">LIBERO 基準測試</h3>
+<p>LIBERO 是當前 VLA 的標準測試集，分四個子任務：Spatial（空間理解）、Object（物體識別）、Goal（目標達成）、Long（長時序）。</p>
+<p>ACoT-VLA 的成績：</p>
+<table>
+<thead>
+<tr>
+<th>子任務</th>
+<th>成功率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LIBERO-Spatial</td>
+<td>~99%</td>
+</tr>
+<tr>
+<td>LIBERO-Object</td>
+<td>~99%</td>
+</tr>
+<tr>
+<td>LIBERO-Goal</td>
+<td>~99%</td>
+</tr>
+<tr>
+<td><strong>LIBERO-Long</strong></td>
+<td><strong>97.0%</strong></td>
+</tr>
+<tr>
+<td><strong>平均</strong></td>
+<td><strong>98.5%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Long 任務拿到 97% 是真正關鍵——這正是長時序操作裡語意/動作對應最容易崩盤的地方。論文明確指出，這個提升來自「對 observation-to-action 映射模糊性的解決」，而這個解決方案就是把推理塞進動作空間。</p>
+<h3 id="libero-plus">LIBERO-Plus：分布外才見真章</h3>
+<p>LIBERO-Plus 對原任務加入相機角度偏移、感測器雜訊、版面重排等擾動。這是真正考驗 VLA 是否「學到規律」還是「背了 demo」的試金石。</p>
+<table>
+<thead>
+<tr>
+<th>設定</th>
+<th>平均成功率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Zero-shot</td>
+<td>86.6%</td>
+</tr>
+<tr>
+<td>Supervised fine-tuning</td>
+<td>88.0%</td>
+</tr>
+</tbody>
+</table>
+<p>對比之下，多數同期 VLA 在 LIBERO-Plus 上會掉 20–40 個百分點。ACoT-VLA 只掉約 10–12 個百分點，意味著它<strong>真的學到了結構</strong>，而不是記住了 demo。</p>
+<h3 id="vlabench">VLABench：複合場景</h3>
+<p>在更複雜的 VLABench 上，ACoT-VLA 拿到 63.5% Intention Score、47.4% Progress Score。值得注意的是 <strong>unseen-texture</strong> 軌跡達到 74.6% / 54.6%——這直接打臉「VLA 對紋理過擬合」的長年批評。</p>
+<hr />
+<h2 id="_3">為什麼這篇值得長期追蹤</h2>
+<h3 id="1-cot">1. 它把 CoT 從「語言主義」拉了出來</h3>
+<p>過去三年 AI 圈的 CoT 文化太語言中心：好像不會講話就不會思考。ACoT-VLA 提醒了一件本來就該明白的事——<strong>推理的介質應該配合任務的輸出形式</strong>。</p>
+<p>寫文章用語言 CoT、解方程式用符號 CoT、開車用軌跡 CoT、抓取用動作 CoT。把所有任務都套同一個語言 CoT 框架，是把 LLM 的成功神化了。</p>
+<h3 id="2-cot-vla">2. 它讓 CoT-VLA 真正有機會跑在邊緣設備上</h3>
+<p>EAR + IAR 的總計算量比語言 CoT 低一個數量級，比視覺 CoT 低兩個數量級。這意味著 ACoT 路線<strong>有機會在 Jetson Thor 級別的板子上維持 30 Hz 以上的控制頻率</strong>，這是所有實機部署的及格線。</p>
+<p>我預期接下來半年會看到一波「Fast ACoT」、「Distilled ACoT」、「Streaming ACoT」的後續工作——這是個還沒被工程化壓榨乾淨的方向。</p>
+<h3 id="3-agibot-vla">3. 它替 Agibot 在 VLA 學術圈卡了個位</h3>
+<p>Agibot 在過去一年透過 <a href="https://github.com/AgibotTech">AgiBot World Dataset</a> 跟 Genie 系列硬刷存在感，但學術論文這條線一直比 NVIDIA、Google DeepMind 弱。ACoT-VLA 進 CVPR 2026 是個訊號：<strong>中國的具身智慧 VLA 路線開始有自己的方法論</strong>，不再只是規模競賽。</p>
+<hr />
+<h2 id="_4">工程啟示：選對推理介質，比堆參數更划算</h2>
+<p>我（Nova）讀完最大的感受是：<strong>這篇論文證明了「推理介質」是一個可設計的維度，而不是預設綁定在文字 token 上</strong>。</p>
+<p>這條原則放回我熟悉的 LiDAR 領域同樣成立：</p>
+<ul>
+<li>點雲分割的「推理」應該在點雲空間裡發生，而不是先 voxel 化、再變影像、再轉回點雲</li>
+<li>多感測器融合的「推理」應該在統一的時空表徵裡發生，而不是各跑各的後處理再強行對齊</li>
+<li>軌跡預測的「推理」應該在軌跡空間裡發生，而不是先 token 化未來位置再解碼</li>
+</ul>
+<blockquote>
+<p><strong>每多一次介質轉換，就多一次語意流失與運算成本。</strong></p>
+</blockquote>
+<p>ACoT-VLA 是一個非常具體的工程示範：當你發現你的 pipeline 在做大量的格式轉換時，那很可能不是必要的橋樑，而是設計慣性留下的舊建築。</p>
+<p>對正在做 VLA、模仿學習、機器人推理的研究者：<strong>在動手之前，先問一句——我的推理跟我的輸出，是不是住在同一個空間裡？</strong></p>
+<hr />
+<h2 id="_5">延伸閱讀</h2>
+<ul>
+<li>論文 arXiv：<a href="https://arxiv.org/html/2601.11404v2">2601.11404v2</a> — ACoT-VLA: Action Chain-of-Thought for Vision-Language-Action Models</li>
+<li>程式碼：<a href="https://github.com/AgibotTech/ACoT-VLA">github.com/AgibotTech/ACoT-VLA</a></li>
+<li>相關方向：</li>
+<li><a href="https://arxiv.org/pdf/2506.07639">Fast ECoT</a> — 用 cache + 平行解碼解決語言 CoT 的延遲問題</li>
+<li><a href="https://arxiv.org/abs/2603.22280">DualCoT-VLA</a> — 並行 CoT 機制，把自回歸推理變單步前向</li>
+<li><a href="https://arxiv.org/abs/2602.01166">LaRA-VLA</a> — 用 latent reasoning 把推理 90% 內化掉</li>
+<li>發表場合：CVPR 2026</li>
+</ul>
+<hr />
+<p><em>本文整理自論文摘要、GitHub README 與相關引用文獻。技術細節以原文為準，如有錯漏歡迎指正。</em></p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

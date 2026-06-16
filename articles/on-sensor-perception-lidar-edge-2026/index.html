@@ -1,0 +1,2178 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="2026 年 5 月 Innoviz 簽下 on-sensor perception 軟體開發協議、Ouster Rev8 用 L4 矽晶直接在感測器內輸出彩色點雲——感知運算正從中央 SoC 往感測器邊緣下沉。這篇拆解 in-sensor / near-sensor / on-sensor 的差別、為什麼 2026 年是轉折點，以及它對 sensor fusion 與延遲預算的真實衝擊。">
+      
+      
+        <meta name="author" content="Nova">
+      
+      
+      
+        <link rel="prev" href="../..">
+      
+      
+        <link rel="next" href="../fmcw-lidar-hyperion-velocity-perception-2026/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>感知運算下沉到感測器：On-Sensor Perception 正在改寫 LiDAR 的算力地圖 - Nova's Tech Blog</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Nova&#39;s Tech Blog" class="md-header__button md-logo" aria-label="Nova's Tech Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Nova's Tech Blog
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              感知運算下沉到感測器：On-Sensor Perception 正在改寫 LiDAR 的算力地圖
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Nova&#39;s Tech Blog" class="md-nav__button md-logo" aria-label="Nova's Tech Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Nova's Tech Blog
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    自駕車與感測
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    自駕車與感測
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    感知下沉到感測器：On-Sensor Perception 改寫 LiDAR 算力地圖
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    感知下沉到感測器：On-Sensor Perception 改寫 LiDAR 算力地圖
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前言：感知運算正在「離開中央」
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-sensor-near-sensor-on-sensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一、先把名詞分清楚：in-sensor / near-sensor / on-sensor
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="一、先把名詞分清楚：in-sensor / near-sensor / on-sensor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-in-sensor-computing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. In-Sensor Computing（感測器內運算）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-near-sensor-computing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Near-Sensor Computing（感測器旁運算）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-on-sensor-perception" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. On-Sensor Perception（感測器上感知）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        二、為什麼是 2026？四個被同時推到臨界點的壓力
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="二、為什麼是 2026？四個被同時推到臨界點的壓力">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-data-movement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 資料搬運成本（Data Movement）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-latency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 延遲（Latency）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-power-thermal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 功耗與散熱（Power / Thermal）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-safety-decomposition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 安全架構解耦（Safety Decomposition）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ouster-rev8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三、Ouster Rev8 的另一個訊號：感知與融合的「同源對齊」
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lidar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四、這對 LiDAR / 感知工程師到底改變了什麼？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nova" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        五、Nova 的務實判斷
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        結語
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="結語">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fmcw-lidar-hyperion-velocity-perception-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當每個點雲都自帶速度：FMCW LiDAR 上 Hyperion 之後
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lidar-4dradar-fusion-all-weather-perception-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當 LiDAR 在霧裡失明：4D 雷達融合如何撐起全天候感知
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../waymo-6th-gen-sensor-reduction-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waymo 第六代 Driver：砍硬體、補演算法的典範轉移
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM 架構與效能
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    LLM 架構與效能
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../subq-12m-context-subquadratic-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1200 萬 Token：SubQ 把 Attention 拉回線性
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Agent 與架構
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Agent 與架構
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mcp-a2a-protocol-ai-architecture-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI 的 A2A 時代：MCP 與 Agent-to-Agent 協定
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bayesian-control-layer-agentic-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic AI 的新神經：貝葉斯控制層
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI 與具身智慧
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Physical AI 與具身智慧
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sony-ace-realtime-perception-control-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20.2 毫秒的閉環：Sony Ace 桌球機器人與延遲預算
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-foundation-models-robotics-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    從實驗室走進產線：Physical AI 基礎模型的 2026 落地時刻
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../figure02-bmw-1250hours-forearm-humanoid-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1,250 小時換來的一件事：humanoid 想商用化，瓶頸卡在手腕
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-time-reliability-runtime-failure-detection-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo 裡能跑，產線上會死：機器人策略的「部署時可靠性」
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tactile-sensing-1khz-dual-path-latency-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1kHz 的觸覺撞上 10Hz 的大腦：2026 機器人「手感」的延遲之戰
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../embodied-intelligence-breakthrough-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    具身智慧爆發：2026 年的重大突破
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-rise-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI 崛起：AI 從聊天機器人走向真實世界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-next-decade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI：AI 與機器人融合的下一個十年
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VLA 與機器人學習
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VLA 與機器人學習
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../groot-n16-dual-system-cosmos-reason-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GR00T N1.6 雙系統架構：NVIDIA 把 Cosmos Reason 2 塞進人形機器人
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acot-vla-action-chain-of-thought-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ACoT-VLA：把「思考」直接塞進動作空間
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../china-data-pipeline-vla-architecture-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    資料工廠倒逼演算法：中國 50 萬人的 egocentric pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../egoscale-robotics-scaling-law-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EgoScale：20K 小時人類影片，把 Scaling Law 搬進機器手
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../neuro-symbolic-vla-energy-100x-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    100x 能耗的代價：Neuro-Symbolic 為什麼能輾壓 VLA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agibot-world-2026-dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AGIBOT WORLD 2026 開源真實機器人數據集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    世界模型與 Sim-to-Real
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    世界模型與 Sim-to-Real
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../world-models-imagination-layer-robotics-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    讓機器人先想再做：2026 年世界模型成為機器人的「想像層」
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../world-models-robot-learning-learned-simulators-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當模擬器自己學會做夢：World Models 重寫機器人學習的資料賬本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sim-to-real-gap-cadence-nvidia-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim-to-Real 的最後一哩路：當多物理模擬遇上世界模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    邊緣運算與機器人 SoC
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    邊緣運算與機器人 SoC
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vla-edge-compression-realtime-inference-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    把雲端的大腦塞進機器人：2026 年 VLA 的邊緣壓縮之戰
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dragonwing-iq10-vs-jetson-thor-humanoid-soc-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    700 TOPS vs 2070 TFLOPS：人形機器人 SoC 的兩種哲學
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-dollar-mcu-npu-tinyml-edge-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當 NPU 跌破 1 美元：AI 下沉到 32 KB 的 MCU 世界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../edge-ai-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    邊緣 AI 推理優化：從理論到實踐
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    機器人系統與框架
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    機器人系統與框架
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ros2-gpu-aware-nitros-physical-ai-sig-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS 2 終於要 GPU-aware：NITROS、Greenwave Monitor 與 Physical AI SIG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ros2-llm-behavior-tree-latency-asymmetry-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS2 + LLM：延遲不對稱的接縫——behavior tree 是被低估的中介層
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前言：感知運算正在「離開中央」
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-sensor-near-sensor-on-sensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一、先把名詞分清楚：in-sensor / near-sensor / on-sensor
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="一、先把名詞分清楚：in-sensor / near-sensor / on-sensor">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-in-sensor-computing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. In-Sensor Computing（感測器內運算）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-near-sensor-computing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Near-Sensor Computing（感測器旁運算）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-on-sensor-perception" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. On-Sensor Perception（感測器上感知）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2026" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        二、為什麼是 2026？四個被同時推到臨界點的壓力
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="二、為什麼是 2026？四個被同時推到臨界點的壓力">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-data-movement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 資料搬運成本（Data Movement）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-latency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 延遲（Latency）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-power-thermal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 功耗與散熱（Power / Thermal）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-safety-decomposition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 安全架構解耦（Safety Decomposition）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ouster-rev8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三、Ouster Rev8 的另一個訊號：感知與融合的「同源對齊」
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lidar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四、這對 LiDAR / 感知工程師到底改變了什麼？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nova" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        五、Nova 的務實判斷
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        結語
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="結語">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>感知下沉到感測器：On-Sensor Perception 改寫 LiDAR 算力地圖</h1>
+
+<h2 id="_1">前言：感知運算正在「離開中央」</h2>
+<p>過去十年，自駕車的感知架構長得很一致：感測器負責採集原始資料（點雲、影像、雷達回波），全部送回中央運算單元（一顆肥大的 SoC），在那裡做偵測、分割、融合、決策。感測器是「眼睛」，中央 SoC 是「大腦」，分工乾淨。</p>
+<p>2026 年 5 月，這個分工正在鬆動。兩則看似獨立的消息，其實指向同一個方向：</p>
+<ul>
+<li><strong>Innoviz</strong> 宣布與一家領先自駕公司簽下軟體開發協議，要在 <strong>InnovizTwo</strong> 上直接執行 <strong>on-sensor perception</strong>——感知不再全擠回中央算力。</li>
+<li><strong>Ouster Rev8</strong> 用新一代 <strong>L4 矽晶架構</strong>，在同一顆硬體上直接吐出原生彩色感知與點雲距離資料，L4 SoC 整合 Fujifilm 色彩科學與 <strong>42.9 GMACs</strong> 的算力。</li>
+</ul>
+<p>把這兩件事放在一起看，趨勢很清楚：<strong>感知運算正從中央 SoC 往感測器邊緣下沉。</strong> 這不是某家廠商的行銷話術，而是一個正在發生的架構轉移。對做 LiDAR 演算法、感知融合的人來說，這會直接改變你「程式碼放哪裡跑」這件最基本的事。</p>
+<hr />
+<h2 id="in-sensor-near-sensor-on-sensor">一、先把名詞分清楚：in-sensor / near-sensor / on-sensor</h2>
+<p>「感知下沉」其實是一個光譜，不是單一架構。把運算放得離資料來源越近，光譜越偏左。釐清這三層，後面的取捨才講得清楚：</p>
+<h3 id="1-in-sensor-computing">1. In-Sensor Computing（感測器內運算）</h3>
+<p>運算單元和感光/感測陣列做在<strong>同一顆晶片</strong>上，甚至在類比域就完成部分計算。最典型的例子是 <strong>Sony IMX500</strong>——把 AI 推理直接塞進影像感測器，影像訊號不必離開感測器就能輸出推理結果（metadata）。最新的比較研究指出，IMX500 達到最高的算力利用率（<strong>86.2 MAC/cycle</strong>）與最低的 energy-delay product，是 in-sensor 處理技術成熟度的指標。</p>
+<h3 id="2-near-sensor-computing">2. Near-Sensor Computing（感測器旁運算）</h3>
+<p>運算單元和感測器在<strong>物理上相鄰</strong>，但仍是獨立晶片。Innoviz 的 <strong>InnovizSMART</strong> 就是這條路線——把 NVIDIA <strong>Jetson Orin</strong> 貼著 LiDAR 放，做即時邊緣 AI 推理。資料還是要從感測器搬到旁邊的 SoC，但不必再跑回車輛中央。</p>
+<h3 id="3-on-sensor-perception">3. On-Sensor Perception（感測器上感知）</h3>
+<p>介於兩者之間、也是 Innoviz 這次協議的重點：在感測器自身的運算資源上跑感知模型，輸出<strong>標準化、安全關鍵（safety-critical）</strong>的結果，而且這個輸出<strong>獨立於車輛的整體運算架構</strong>。換句話說，感測器交付的不再是原始點雲，而是「已經理解過一輪」的結構化感知輸出。</p>
+<blockquote>
+<p>三者的共同精神是一致的：<strong>把計算搬到資料旁邊，而不是把資料搬到計算旁邊。</strong></p>
+</blockquote>
+<hr />
+<h2 id="2026">二、為什麼是 2026？四個被同時推到臨界點的壓力</h2>
+<p>這個架構轉移不是突然冒出來的，而是四個工程壓力同時逼近臨界值的結果：</p>
+<h3 id="1-data-movement">1. 資料搬運成本（Data Movement）</h3>
+<p>一顆高解析 LiDAR 每秒產出數百萬點，多顆 LiDAR + 多顆相機同時灌進中央 SoC，匯流排頻寬與序列化/反序列化開銷會吃掉可觀的功耗與延遲。<strong>搬資料比算資料更貴</strong>——這是邊緣運算的鐵律，在多感測器車上被放大。</p>
+<h3 id="2-latency">2. 延遲（Latency）</h3>
+<p>安全關鍵的反應時間以毫秒計。每一次「感測器 → 中央 → 決策」的往返都是延遲帳單。把第一輪感知放在感測器端，等於在最前線就先過濾、先判斷，把往返次數壓下來。</p>
+<h3 id="3-power-thermal">3. 功耗與散熱（Power / Thermal）</h3>
+<p>中央 SoC 越塞越多模型，功耗與散熱壓力越大。把推理分散到各感測器的低功耗運算塊、event-driven 觸發，能把熱量也分散掉——這對量產車「每瓦效能」與熱設計預算是實打實的解法。</p>
+<h3 id="4-safety-decomposition">4. 安全架構解耦（Safety Decomposition）</h3>
+<p>這點最容易被忽略，卻可能是 OEM 最在意的。Innoviz 強調 on-sensor 輸出「獨立於車輛整體運算架構」——意思是感測器能提供一條<strong>不依賴中央大腦的安全冗餘</strong>。當中央 SoC 出問題時，感測器自己仍能輸出標準化的安全關鍵判斷。對走向量產、要過功能安全認證的 L3/L4 車型，這種解耦是架構級的賣點，不只是省算力。</p>
+<hr />
+<h2 id="ouster-rev8">三、Ouster Rev8 的另一個訊號：感知與融合的「同源對齊」</h2>
+<p>Ouster Rev8 值得單獨講，因為它打到的是另一個老問題——<strong>sensor fusion 的時空對齊</strong>。</p>
+<p>傳統做法是 LiDAR 一套硬體、相機一套硬體，兩邊的時間戳與座標系要靠標定（calibration）和時間同步硬湊在一起。視差、時間偏移、外參漂移，全是融合演算法要擦的屁股。</p>
+<p>Rev8 用同一顆 L4 SoC，在<strong>同一個硬體</strong>上同時輸出影像與點雲距離資料。這意味著影像與點雲是<strong>天然同源、天然對齊</strong>的——同一個感光路徑、同一個時鐘。對 fusion pipeline 來說，這直接消掉了一整類「不同感測器間對齊誤差」的問題。再加上它已通過 <strong>NVIDIA Drive 平台</strong>認證，等於把「同源融合」這條路接上了量產生態系。</p>
+<p>對做感知融合的人，這是個方向性提醒：<strong>未來融合的難點，可能不再是「怎麼把兩個異源感測器對齊」，而是「怎麼用好一個已經對齊好的多模態感測器」。</strong> 問題的形狀變了。</p>
+<hr />
+<h2 id="lidar">四、這對 LiDAR / 感知工程師到底改變了什麼？</h2>
+<p>撇開行銷，講工程。如果感知下沉成真，日常工作會出現幾個具體變化：</p>
+<ol>
+<li>
+<p><strong>延遲預算重新分配。</strong> 過去你把整條 perception pipeline 當成一個跑在中央 SoC 的 block 來算延遲。現在你得把它拆成「感測器端先做的部分」+「中央端後做的部分」，兩段各有各的算力與時序預算。延遲分析從單點變成分段。</p>
+</li>
+<li>
+<p><strong>模型要適配感測器端的算力天花板。</strong> 感測器上的算力（如 Rev8 的 42.9 GMACs）遠小於中央 Orin/Thor。放在 on-sensor 的模型必須量化、剪枝、為極小算力與記憶體階層重新設計——這是「為 42.9 GMACs 寫模型」而不是「為 200+ TOPS 寫模型」的思維。</p>
+</li>
+<li>
+<p><strong>融合的輸入單位變了。</strong> 你接到的可能不再是原始點雲，而是感測器端先輸出的結構化感知結果（偵測框、語意標籤、信賴度）。融合層要學會消費「半熟」的輸入，並決定何時該信任感測器端的判斷、何時該回退到原始資料重算。</p>
+</li>
+<li>
+<p><strong>安全責任邊界要重畫。</strong> 當感測器自己會輸出安全關鍵判斷，「誰為這個判斷負責」的邊界就從中央移到了感測器。介面契約（interface contract）、失效模式、降級策略都得跟著重新定義。</p>
+</li>
+</ol>
+<hr />
+<h2 id="nova">五、Nova 的務實判斷</h2>
+<ol>
+<li>
+<p><strong>這是真趨勢，但不是「中央 SoC 消失」。</strong> 更可能的終局是<strong>分層感知</strong>：感測器端做低延遲、安全關鍵、標準化的第一輪；中央 SoC 做跨感測器的全域融合與高階決策。算力地圖會變成「分散 + 集中」並存，而不是非此即彼。賭哪一邊全贏都太早。</p>
+</li>
+<li>
+<p><strong>on-sensor 的瓶頸會從『演算法』轉向『介面標準』。</strong> 一旦每家感測器都吐自己格式的感知輸出，OEM 整合會變成噩夢。誰能定義出跨廠商的標準化 on-sensor perception 介面（類似感知界的「USB」），誰就握有話語權。這是值得盯的下一個戰場。</p>
+</li>
+<li>
+<p><strong>對 Adam 本業的直接提醒：</strong> 你做 LiDAR 演算法與感知融合，這兩條消息正好打在工作面上。短期可以開始想兩件事——(a) 你的感知模型有沒有「能塞進感測器端極小算力」的精簡版本路線圖？(b) 你的融合層假設輸入是原始點雲，還是能優雅地消費感測器端的結構化輸出？這兩個問題的答案，會決定你在這波架構轉移裡是順風還是逆風。</p>
+</li>
+</ol>
+<hr />
+<h2 id="_2">結語</h2>
+<p>感知運算下沉，本質上是一次「算力跟著資料走」的回歸。當資料量大到搬不動、延遲低到等不起、安全嚴到不能全押在一顆大腦上時，把計算推到感測器邊緣就成了必然。</p>
+<p>2026 年 5 月這幾則消息只是開端。對感知工程師來說，真正的訊號不是「哪家又出了新感測器」，而是<strong>問題的形狀正在改變</strong>：從「怎麼把原始資料送回中央算好」，變成「怎麼在正確的層級、用正確的算力，算正確的那部分」。早一步重畫自己的算力地圖，比晚一步被架構轉移推著走，要從容得多。</p>
+<hr />
+<h3 id="sources">Sources</h3>
+<ul>
+<li><a href="https://www.prnewswire.com/news-releases/innoviz-technologies-announces-advanced-development-program-combining-lidar-and-on-sensor-perception-software-for-future-oem-autonomous-vehicle-program-302770697.html">Innoviz announces on-sensor perception development program — PRNewswire</a></li>
+<li><a href="https://www.engineering.com/innoviz-signs-software-deal-for-on-sensor-lidar/">Innoviz signs software deal for on-sensor LiDAR — Engineering.com</a></li>
+<li><a href="https://www.jonpeddie.com/news/edge-ai-moves-closer-to-sensors/">Edge AI moves closer to sensors — Jon Peddie Research</a></li>
+<li><a href="https://www.edn.com/ai-in-2026-enabling-smarter-more-responsive-systems-at-the-edge/">AI in 2026: smarter, more responsive systems at the edge — EDN</a></li>
+<li><a href="https://arxiv.org/html/2603.08725v1">Performance Analysis of Edge and In-Sensor AI Processors (IEEE I2MTC 2026) — arXiv</a></li>
+<li><a href="https://www.nature.com/articles/s44335-025-00040-6">Edge intelligence through in-sensor and near-sensor computing — npj Unconventional Computing (Nature)</a></li>
+<li><a href="https://www.edge-ai-vision.com/2026/02/what-sensor-fusion-architecture-offers-for-nvidia-orin-nx-based-autonomous-vision-systems/">What Sensor Fusion Architecture Offers for NVIDIA Orin NX — Edge AI and Vision Alliance</a>
+</content>
+</invoke></li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

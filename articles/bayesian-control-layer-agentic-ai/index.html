@@ -1,0 +1,2268 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="當大型語言模型能規劃、能 Tool Use，下一個瓶頸不在模型本身，而在 orchestration 層的決策品質。本文解析 2026 年最新研究：貝葉斯控制層如何為多智能體系統帶來可解釋、資訊驅動的調度機制。">
+      
+      
+        <meta name="author" content="Nova">
+      
+      
+      
+        <link rel="prev" href="../mcp-a2a-protocol-ai-architecture-2026/">
+      
+      
+        <link rel="next" href="../sony-ace-realtime-perception-control-2026/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Agentic AI 的新神經：中間層控制邏輯的典範轉移 - Nova's Tech Blog</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Nova&#39;s Tech Blog" class="md-header__button md-logo" aria-label="Nova's Tech Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Nova's Tech Blog
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Agentic AI 的新神經：中間層控制邏輯的典範轉移
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Nova&#39;s Tech Blog" class="md-nav__button md-logo" aria-label="Nova's Tech Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Nova's Tech Blog
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    自駕車與感測
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    自駕車與感測
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../on-sensor-perception-lidar-edge-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    感知下沉到感測器：On-Sensor Perception 改寫 LiDAR 算力地圖
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fmcw-lidar-hyperion-velocity-perception-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當每個點雲都自帶速度：FMCW LiDAR 上 Hyperion 之後
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lidar-4dradar-fusion-all-weather-perception-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當 LiDAR 在霧裡失明：4D 雷達融合如何撐起全天候感知
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../waymo-6th-gen-sensor-reduction-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waymo 第六代 Driver：砍硬體、補演算法的典範轉移
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM 架構與效能
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    LLM 架構與效能
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../subq-12m-context-subquadratic-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1200 萬 Token：SubQ 把 Attention 拉回線性
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Agent 與架構
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Agent 與架構
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mcp-a2a-protocol-ai-architecture-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI 的 A2A 時代：MCP 與 Agent-to-Agent 協定
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic AI 的新神經：貝葉斯控制層
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic AI 的新神經：貝葉斯控制層
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前言：模型已經足夠強，下一個瓶頸是「誰來決定」
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="前言：模型已經足夠強，下一個瓶頸是「誰來決定」">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#value-of-informationvoi-" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Value of Information（VoI）- 資訊價值驅動調度
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#posterior-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Posterior Update — 後驗更新機制
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#planning-as-probabilistic-inference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Planning as Probabilistic Inference — 將規劃視為機率推論
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bayesian-orchestration-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        實際架構：Bayesian Orchestration Layer 的組成
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="實際架構：Bayesian Orchestration Layer 的組成">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-belief-state-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Belief State Manager（信念狀態管理器）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-voi-calculator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. VoI Calculator（資訊價值計算器）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-policy-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Policy Network（策略網路）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-failure-recovery-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Failure Recovery Controller（失敗恢復控制器）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        為什麼這對軟體工程師重要
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="為什麼這對軟體工程師重要">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        從「串聯」到「網狀」的系統設計思維
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explainability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        可解釋性（Explainability）優先於準確性
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        與現有工具鏈的整合
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        限制與挑戰
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="限制與挑戰">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        規格仍在演化
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        企業級安全模型尚不成熟
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        生態系統碎片化仍在
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        結語：從「調度執行」到「理性决策」
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI 與具身智慧
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Physical AI 與具身智慧
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sony-ace-realtime-perception-control-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20.2 毫秒的閉環：Sony Ace 桌球機器人與延遲預算
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-foundation-models-robotics-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    從實驗室走進產線：Physical AI 基礎模型的 2026 落地時刻
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../figure02-bmw-1250hours-forearm-humanoid-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1,250 小時換來的一件事：humanoid 想商用化，瓶頸卡在手腕
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-time-reliability-runtime-failure-detection-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo 裡能跑，產線上會死：機器人策略的「部署時可靠性」
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tactile-sensing-1khz-dual-path-latency-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1kHz 的觸覺撞上 10Hz 的大腦：2026 機器人「手感」的延遲之戰
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../embodied-intelligence-breakthrough-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    具身智慧爆發：2026 年的重大突破
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-rise-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI 崛起：AI 從聊天機器人走向真實世界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-next-decade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI：AI 與機器人融合的下一個十年
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VLA 與機器人學習
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VLA 與機器人學習
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../groot-n16-dual-system-cosmos-reason-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GR00T N1.6 雙系統架構：NVIDIA 把 Cosmos Reason 2 塞進人形機器人
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acot-vla-action-chain-of-thought-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ACoT-VLA：把「思考」直接塞進動作空間
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../china-data-pipeline-vla-architecture-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    資料工廠倒逼演算法：中國 50 萬人的 egocentric pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../egoscale-robotics-scaling-law-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EgoScale：20K 小時人類影片，把 Scaling Law 搬進機器手
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../neuro-symbolic-vla-energy-100x-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    100x 能耗的代價：Neuro-Symbolic 為什麼能輾壓 VLA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agibot-world-2026-dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AGIBOT WORLD 2026 開源真實機器人數據集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    世界模型與 Sim-to-Real
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    世界模型與 Sim-to-Real
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../world-models-imagination-layer-robotics-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    讓機器人先想再做：2026 年世界模型成為機器人的「想像層」
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../world-models-robot-learning-learned-simulators-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當模擬器自己學會做夢：World Models 重寫機器人學習的資料賬本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sim-to-real-gap-cadence-nvidia-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim-to-Real 的最後一哩路：當多物理模擬遇上世界模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    邊緣運算與機器人 SoC
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    邊緣運算與機器人 SoC
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vla-edge-compression-realtime-inference-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    把雲端的大腦塞進機器人：2026 年 VLA 的邊緣壓縮之戰
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dragonwing-iq10-vs-jetson-thor-humanoid-soc-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    700 TOPS vs 2070 TFLOPS：人形機器人 SoC 的兩種哲學
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-dollar-mcu-npu-tinyml-edge-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當 NPU 跌破 1 美元：AI 下沉到 32 KB 的 MCU 世界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../edge-ai-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    邊緣 AI 推理優化：從理論到實踐
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    機器人系統與框架
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    機器人系統與框架
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ros2-gpu-aware-nitros-physical-ai-sig-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS 2 終於要 GPU-aware：NITROS、Greenwave Monitor 與 Physical AI SIG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ros2-llm-behavior-tree-latency-asymmetry-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS2 + LLM：延遲不對稱的接縫——behavior tree 是被低估的中介層
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前言：模型已經足夠強，下一個瓶頸是「誰來決定」
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="前言：模型已經足夠強，下一個瓶頸是「誰來決定」">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#value-of-informationvoi-" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Value of Information（VoI）- 資訊價值驅動調度
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#posterior-update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Posterior Update — 後驗更新機制
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#planning-as-probabilistic-inference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Planning as Probabilistic Inference — 將規劃視為機率推論
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bayesian-orchestration-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        實際架構：Bayesian Orchestration Layer 的組成
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="實際架構：Bayesian Orchestration Layer 的組成">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-belief-state-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Belief State Manager（信念狀態管理器）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-voi-calculator" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. VoI Calculator（資訊價值計算器）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-policy-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Policy Network（策略網路）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-failure-recovery-controller" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Failure Recovery Controller（失敗恢復控制器）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        為什麼這對軟體工程師重要
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="為什麼這對軟體工程師重要">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        從「串聯」到「網狀」的系統設計思維
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#explainability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        可解釋性（Explainability）優先於準確性
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        與現有工具鏈的整合
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        限制與挑戰
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="限制與挑戰">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        規格仍在演化
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        企業級安全模型尚不成熟
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        生態系統碎片化仍在
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        結語：從「調度執行」到「理性决策」
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>Agentic AI 的新神經：貝葉斯控制層</h1>
+
+<h2 id="_1">前言：模型已經足夠強，下一個瓶頸是「誰來決定」</h2>
+<p>2025 年下半年起，LLM 的能力邊界快速擴展——Reasoning、Tool Use、Long Context、Multimodal 已成標配。然而當這些模型被拿來驅動真正的自動化流程時，工程師們開始遇到一個過去較少被正面處理的問題：</p>
+<blockquote>
+<p><strong>當多個 Agent 需要協作、當規劃步驟跨越數十個 Tool、當失敗需要被及時catch並重試——「調度邏輯」本身的設計就成了系統穩定性的最大變數。</strong></p>
+</blockquote>
+<p>這不只是「加個 if-else」的問題。傳統的 Rule-based orchestration 無法處理資訊不確定性，也難以在任務中途動態調整優先級。於是 2026 年的前沿研究開始往一個方向收斂：<strong>Bayesian Control Layer for Agentic Systems（貝葉斯控制層）</strong>。</p>
+<p>所謂 <strong>Agentic AI</strong>，指的是具備以下能力的 AI 系統：
+- <strong>自主規劃</strong>（Planning）：將高層目標拆解為可執行步驟
+- <strong>Tool Use</strong>：呼叫外部工具、API、資料庫
+- <strong>Iterative Refinement</strong>：根據回饋調整策略
+- <strong>Long-horizon Execution</strong>：跨時間維持上下文一致性</p>
+<p>而 <strong>Orchestration Layer</strong> 就是協調以上能力的「大腦」。它決定：
+- 哪個 Agent 在哪個時間點做什麼
+- 遇到失敗時如何重試或繞道
+- 如何分配有限資訊預算（Context Window）給不同子任務</p>
+<p>目前多數生產系統採用的是：
+- <strong>LCNC（Linear Chain of Commands）</strong>：一步一步執行，簡單但脆弱
+- <strong>Priority Queue</strong>：基於靜態優先級，容易有deadlock風險</p>
+<p>這些方法的共同缺陷：<strong>不處理「資訊價值」的概念</strong>。</p>
+<p>2026 年 5 月初，一篇 arXiv 論文（arXiv:2605.00742）提出了系統性的框架，核心概念是：</p>
+<h3 id="value-of-informationvoi-">Value of Information（VoI）- 資訊價值驅動調度</h3>
+<p>傳統系統在每個步驟都「盡量收集最多資訊」。但貝葉斯框架的起點不同：<strong>在有限計算預算下，資訊是有成本的，你需要計算每一單位資訊的「期望價值」</strong>。</p>
+<p>具體來說，系統在每個調度節點計算：</p>
+<pre><code>Expected Value of Action = Σ (P(outcome_i) × Utility(outcome_i)) / Cost(action)
+</code></pre>
+<p>當某個 Tool 的調用成本高、但失敗概率也高時，系統會優先考慮先用低成本方式獲取更多確定性。這不是僵硬規則，而是動態的貝葉斯更新。</p>
+<h3 id="posterior-update">Posterior Update — 後驗更新機制</h3>
+<p>每次 Tool 返回結果，系統會更新其對任務狀態的信念（Belief），類似於貝葉斯公式：</p>
+<pre><code>P(H | E) = P(E | H) × P(H) / P(E)
+</code></pre>
+<p>這讓系統能：
+- <strong>追蹤置信度</strong>：每個子任務的成功概率被持續更新
+- <strong>早期失敗檢測</strong>：當某條路徑的後驗概率跌破閾值，自動切換策略
+- <strong>可解釋的決策</strong>：每個調度決策都有概率解釋，而非黑箱</p>
+<h3 id="planning-as-probabilistic-inference">Planning as Probabilistic Inference — 將規劃視為機率推論</h3>
+<p>論文的一個更激進的觀點：將傳統的「規劃」重新框架為「機率推論」。傳統 planning 是搜尋問題（search problem），但當狀態空間極大時，搜尋效率會快速崩潰。</p>
+<p>貝葉斯框架將規劃問題轉化為：<strong>「在所有可能行動序列中，找到最大後驗機率的序列」</strong>。這讓 prior knowledge（先驗知識）可以被系統性引入，而不是全部從頭探索。</p>
+<hr />
+<h2 id="bayesian-orchestration-layer">實際架構：Bayesian Orchestration Layer 的組成</h2>
+<p>根據論文與近期產業實踐，一個貝葉斯控制層大致包含以下模組：</p>
+<h3 id="1-belief-state-manager">1. Belief State Manager（信念狀態管理器）</h3>
+<p>維護當前任務的「世界模型」狀態，包含：
+- 每個 sub-agent 的成功概率
+- 目前消耗的資源預算
+- 已驗證的事實 vs 假設</p>
+<h3 id="2-voi-calculator">2. VoI Calculator（資訊價值計算器）</h3>
+<p>在每個決策點，評估即將執行的每個 action 的 Expected Value，公式近似：</p>
+<pre><code>VoI(action) = Expected_Utility(action) - Expected_Utility(do_nothing)
+</code></pre>
+<p>若 VoI 為正，則執行；為負則跳過或延後。</p>
+<h3 id="3-policy-network">3. Policy Network（策略網路）</h3>
+<p>這個模組負責從信念狀態映射到實際行動。它的輸出不是硬編碼的規則，而是<strong>最優的機率分佈</strong>：在這個信念狀態下，各 action 的執行機率。</p>
+<h3 id="4-failure-recovery-controller">4. Failure Recovery Controller（失敗恢復控制器）</h3>
+<p>傳統重試機制往往是「失敗後原地重試」。貝葉斯框架的失敗恢復會：
+1. 分析失敗原因（從信念狀態更新概率分佈）
+2. 選擇最大後驗期望價值的替代路徑
+3. 記錄失敗模式以改進 prior</p>
+<hr />
+<h2 id="_2">為什麼這對軟體工程師重要</h2>
+<h3 id="_3">從「串聯」到「網狀」的系統設計思維</h3>
+<p>多數工程師熟悉的系統設計是確定的（deterministic）：A → B → C，邏輯清晰、可追蹤。貝葉斯框架要求你接受<strong>不確定性是常態</strong>，並系統性地管理它。</p>
+<p>這是從「Functional Programming」到「Probabilistic Programming」的認知轉移。</p>
+<h3 id="explainability">可解釋性（Explainability）優先於準確性</h3>
+<p>在生產系統中，「為什麼系統選擇了這條路徑」往往比「這條路徑的準確率」更重要。貝葉斯層的决策可以被追蹤、解释、審計。這對高度監管的產業（金融、醫療、資安）尤其關鍵。</p>
+<h3 id="_4">與現有工具鏈的整合</h3>
+<p>這個框架並非要你重寫整個系統。以下是與現有工具的整合點：</p>
+<ul>
+<li><strong>LangChain / LangGraph</strong>：現有框架可加入 VoI Calculator 作為額外節點</li>
+<li><strong>OpenAI / Anthropic API</strong>：利用 function calling 作為 tool，貝葉斯層在上方做調度</li>
+<li><strong>LlamaIndex</strong>：用於知識檢索，貝葉斯層決定何時需要 RAG、何時直接回答</li>
+</ul>
+<hr />
+<h2 id="_5">限制與挑戰</h2>
+<p>沒有完美的框架，貝葉斯控制層也有其瓶頸：</p>
+<h3 id="_6">規格仍在演化</h3>
+<p>MCP 和 A2A 的規範都不是 1.0 版本。功能集合、錯誤處理機制、安全模型都在持續更新。現在投入生產系統有「規範變動」的維護成本。</p>
+<h3 id="_7">企業級安全模型尚不成熟</h3>
+<p>MCP 目前支援基本的 permission scope，但<strong>跨組織的 Agent 認證、數據主權審計、端到端加密</strong>還沒有標準化的解決方案。這對金融、醫療等高度監管產業是實實在在的阻礙。</p>
+<h3 id="_8">生態系統碎片化仍在</h3>
+<p>不是所有框架都支援 MCP/A2A。許多雲端 AI 平台（AWS Bedrock、Google Vertex AI）還在用自家的專屬整合方式。標準化的價值在於網路效應——<strong>在多數主流平台支援之前，效益有限</strong>。</p>
+<hr />
+<h2 id="_9">結語：從「調度執行」到「理性决策」</h2>
+<p>貝葉斯控制層代表的趨勢，不只是一個新框架，而是一種<strong>將 AI 系統決策視為理性推理過程</strong>的態度。它要求我們：</p>
+<ol>
+<li><strong>建模不確定性</strong>：不再假裝系統知道所有事情</li>
+<li><strong>量化決策價值</strong>：每個 action 的收益與成本都需要被計算</li>
+<li><strong>保持可解釋性</strong>：決策邏輯必須能被人類審查與干預</li>
+</ol>
+<p>對於軟體工程師而言，這是從「寫邏輯」到「寫決策框架」的升級。你的程式碼不再是靜態流程圖，而是一個能根據新資訊動態更新信念的系統。</p>
+<p>2026 年的 AI 系統競爭，已經從「誰的模型更強」轉移到「誰的 orchestration 更有智慧」。貝葉斯控制層，是這場競爭中值得關注的技術方向。</p>
+<hr />
+<p><strong>參考來源：</strong>
+- [arXiv:2605.00742] Bayesian Decision Theory for Agentic Orchestration (2026)
+- [devflokers] AI Tech Breakthroughs (May 3-4, 2026)
+- [MIT Technology Review] 10 Things That Matter in AI Right Now (April 2026)
+- [Stanford HAI] AI Index 2026 Report</p>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2310 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="2025 ROSCon Singapore，NVIDIA 一口氣丟出三件事：把 GPU-aware abstractions 上推到 ROS 2 upstream、釋出 Greenwave Monitor、在 OSRA 底下推動 Physical AI SIG。多數新聞稿只寫『NVIDIA 強化 ROS 2』，但這背後是一個更大的問題：ROS 2 的 executor 與 message passing 從一開始就是 CPU-centric 的，NITROS 是 sidecar 的 workaround，2026 真正在發生的事情，是整個框架自己被改寫成異質計算友善的版本。這篇是給 LiDAR / 嵌入式 / ROS2 工程師的結構面拆解——以及為什麼這條改動比任何 demo 都更值得追。">
+      
+      
+        <meta name="author" content="Nova">
+      
+      
+      
+        <link rel="prev" href="../edge-ai-inference/">
+      
+      
+        <link rel="next" href="../ros2-llm-behavior-tree-latency-asymmetry-2026/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>ROS 2 終於要 GPU-aware：NITROS、Greenwave Monitor 與 Physical AI SIG 背後的 2026 framework 重構 - Nova's Tech Blog</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Nova&#39;s Tech Blog" class="md-header__button md-logo" aria-label="Nova's Tech Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Nova's Tech Blog
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ROS 2 終於要 GPU-aware：NITROS、Greenwave Monitor 與 Physical AI SIG 背後的 2026 framework 重構
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Nova&#39;s Tech Blog" class="md-nav__button md-logo" aria-label="Nova's Tech Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Nova's Tech Blog
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    自駕車與感測
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    自駕車與感測
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../on-sensor-perception-lidar-edge-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    感知下沉到感測器：On-Sensor Perception 改寫 LiDAR 算力地圖
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fmcw-lidar-hyperion-velocity-perception-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當每個點雲都自帶速度：FMCW LiDAR 上 Hyperion 之後
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lidar-4dradar-fusion-all-weather-perception-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當 LiDAR 在霧裡失明：4D 雷達融合如何撐起全天候感知
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../waymo-6th-gen-sensor-reduction-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waymo 第六代 Driver：砍硬體、補演算法的典範轉移
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM 架構與效能
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    LLM 架構與效能
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../subq-12m-context-subquadratic-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1200 萬 Token：SubQ 把 Attention 拉回線性
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Agent 與架構
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Agent 與架構
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mcp-a2a-protocol-ai-architecture-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI 的 A2A 時代：MCP 與 Agent-to-Agent 協定
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bayesian-control-layer-agentic-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic AI 的新神經：貝葉斯控制層
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI 與具身智慧
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Physical AI 與具身智慧
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sony-ace-realtime-perception-control-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20.2 毫秒的閉環：Sony Ace 桌球機器人與延遲預算
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-foundation-models-robotics-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    從實驗室走進產線：Physical AI 基礎模型的 2026 落地時刻
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../figure02-bmw-1250hours-forearm-humanoid-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1,250 小時換來的一件事：humanoid 想商用化，瓶頸卡在手腕
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-time-reliability-runtime-failure-detection-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo 裡能跑，產線上會死：機器人策略的「部署時可靠性」
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tactile-sensing-1khz-dual-path-latency-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1kHz 的觸覺撞上 10Hz 的大腦：2026 機器人「手感」的延遲之戰
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../embodied-intelligence-breakthrough-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    具身智慧爆發：2026 年的重大突破
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-rise-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI 崛起：AI 從聊天機器人走向真實世界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-next-decade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI：AI 與機器人融合的下一個十年
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VLA 與機器人學習
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VLA 與機器人學習
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../groot-n16-dual-system-cosmos-reason-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GR00T N1.6 雙系統架構：NVIDIA 把 Cosmos Reason 2 塞進人形機器人
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acot-vla-action-chain-of-thought-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ACoT-VLA：把「思考」直接塞進動作空間
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../china-data-pipeline-vla-architecture-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    資料工廠倒逼演算法：中國 50 萬人的 egocentric pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../egoscale-robotics-scaling-law-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EgoScale：20K 小時人類影片，把 Scaling Law 搬進機器手
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../neuro-symbolic-vla-energy-100x-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    100x 能耗的代價：Neuro-Symbolic 為什麼能輾壓 VLA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agibot-world-2026-dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AGIBOT WORLD 2026 開源真實機器人數據集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    世界模型與 Sim-to-Real
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    世界模型與 Sim-to-Real
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../world-models-imagination-layer-robotics-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    讓機器人先想再做：2026 年世界模型成為機器人的「想像層」
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../world-models-robot-learning-learned-simulators-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當模擬器自己學會做夢：World Models 重寫機器人學習的資料賬本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sim-to-real-gap-cadence-nvidia-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim-to-Real 的最後一哩路：當多物理模擬遇上世界模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    邊緣運算與機器人 SoC
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    邊緣運算與機器人 SoC
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vla-edge-compression-realtime-inference-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    把雲端的大腦塞進機器人：2026 年 VLA 的邊緣壓縮之戰
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dragonwing-iq10-vs-jetson-thor-humanoid-soc-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    700 TOPS vs 2070 TFLOPS：人形機器人 SoC 的兩種哲學
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-dollar-mcu-npu-tinyml-edge-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當 NPU 跌破 1 美元：AI 下沉到 32 KB 的 MCU 世界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../edge-ai-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    邊緣 AI 推理優化：從理論到實踐
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    機器人系統與框架
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    機器人系統與框架
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS 2 終於要 GPU-aware：NITROS、Greenwave Monitor 與 Physical AI SIG
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS 2 終於要 GPU-aware：NITROS、Greenwave Monitor 與 Physical AI SIG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前言：被新聞稿淹沒的結構面變化
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ros-2-cpu-centric" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一、為什麼 ROS 2 從一開始就是 CPU-centric 的
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nitros-workaround" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        二、NITROS 是聰明的 workaround，但它的限制也說明了問題的本質
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="二、NITROS 是聰明的 workaround，但它的限制也說明了問題的本質">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#type-adaptationrep-2007" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type Adaptation（REP-2007）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-negotiationrep-2009" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type Negotiation（REP-2009）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2025-roscon-singapore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三、2025 ROSCon Singapore 真正在發生的事
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="三、2025 ROSCon Singapore 真正在發生的事">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-physical-ai-sig-osra-nvidia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Physical AI SIG 在 OSRA 底下，不是 NVIDIA 內部
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-gpu-aware-abstractions-ros-2-isaac-ros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. GPU-aware abstractions 上推到 ROS 2，不是 Isaac ROS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-greenwave-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Greenwave Monitor 不是隨便附贈的工具
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lidar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四、對 LiDAR / 點雲工程師意味著什麼
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="四、對 LiDAR / 點雲工程師意味著什麼">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1. 「在哪一層做拷貝」會變成設計題
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2. 觀測工具會變成必修
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-isaac-framework-vs-vendor-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3. 跟 Isaac 的關係要分清楚：framework vs vendor package
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vendor-pull" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        五、批判：這也是 vendor pull 的故事
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lidar-ros2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        結語：給 LiDAR / ROS2 工程師的三條建議
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        來源
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ros2-llm-behavior-tree-latency-asymmetry-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS2 + LLM：延遲不對稱的接縫——behavior tree 是被低估的中介層
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前言：被新聞稿淹沒的結構面變化
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ros-2-cpu-centric" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一、為什麼 ROS 2 從一開始就是 CPU-centric 的
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nitros-workaround" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        二、NITROS 是聰明的 workaround，但它的限制也說明了問題的本質
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="二、NITROS 是聰明的 workaround，但它的限制也說明了問題的本質">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#type-adaptationrep-2007" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type Adaptation（REP-2007）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-negotiationrep-2009" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type Negotiation（REP-2009）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2025-roscon-singapore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三、2025 ROSCon Singapore 真正在發生的事
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="三、2025 ROSCon Singapore 真正在發生的事">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-physical-ai-sig-osra-nvidia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Physical AI SIG 在 OSRA 底下，不是 NVIDIA 內部
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-gpu-aware-abstractions-ros-2-isaac-ros" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. GPU-aware abstractions 上推到 ROS 2，不是 Isaac ROS
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-greenwave-monitor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Greenwave Monitor 不是隨便附贈的工具
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lidar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四、對 LiDAR / 點雲工程師意味著什麼
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="四、對 LiDAR / 點雲工程師意味著什麼">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1. 「在哪一層做拷貝」會變成設計題
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2. 觀測工具會變成必修
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43-isaac-framework-vs-vendor-package" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3. 跟 Isaac 的關係要分清楚：framework vs vendor package
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vendor-pull" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        五、批判：這也是 vendor pull 的故事
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lidar-ros2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        結語：給 LiDAR / ROS2 工程師的三條建議
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        來源
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>ROS 2 終於要 GPU-aware：NITROS、Greenwave Monitor 與 Physical AI SIG</h1>
+
+<h2 id="_1">前言：被新聞稿淹沒的結構面變化</h2>
+<p>過去兩週，AI / robotics 新聞圈圍繞 NVIDIA 與 ROS 2 的標題大致長成這樣：「NVIDIA 強化開源機器人」、「Isaac ROS 4.0 登上 Jetson Thor」、「NVIDIA 釋出新工具加速 ROS 開發」。如果只看這些新聞稿你會以為這是又一次廠商 SDK 升級。</p>
+<p>但把三條新聞放在一起看，會看到完全不一樣的東西：</p>
+<ol>
+<li><strong>GPU-aware abstractions 要上推 ROS 2 upstream</strong>，而不是繼續以 vendor package 的形式存在</li>
+<li><strong>Greenwave Monitor 開源</strong>——一個用 C++ 寫的、節點頻率/延遲監控工具</li>
+<li><strong>OSRA（Open Source Robotics Alliance）底下成立 Physical AI SIG</strong>，主題是 real-time control 決定性、GPU-based local inference、telemetry 與 sim-to-real</li>
+</ol>
+<p>這三件事不是「都是 NVIDIA 做的所以一起發」。它們是同一個結構性問題的三個切面：<strong>ROS 2 框架本身從一開始就是 CPU-centric 的，到 2026 已經撐不住 physical AI 這個用例。</strong> NVIDIA 在做的事情，不是把自己的東西塞進 ROS 2，而是把 ROS 2 的核心 message passing 與 executor 模型，重寫到能夠原生理解 GPU 與 NPU 的程度。</p>
+<blockquote>
+<p><strong>這條變化對一個寫 ROS 2 / LiDAR / C++ 的工程師而言，比任何「機器人聽人話」的 demo 都更值得花時間搞懂。</strong> 因為它會直接改變你接下來幾年怎麼寫 node、怎麼設計 pipeline、以及在 Foxconn / 任何 Isaac AMR 用戶廠房裡你需要懂哪些抽象層。</p>
+</blockquote>
+<p>這篇就是來拆這個結構變化的：為什麼 ROS 2 一開始就 CPU-first、NITROS 為什麼只是 workaround、upstream GPU-aware 抽象到底改了什麼、Greenwave Monitor 為什麼會跟著一起出現，以及這對 LiDAR / 點雲工程師的工作會是怎樣的訊號。</p>
+<hr />
+<h2 id="ros-2-cpu-centric">一、為什麼 ROS 2 從一開始就是 CPU-centric 的</h2>
+<p>要看懂為什麼這次的改動重要，得先回到 ROS 2 的設計脈絡。</p>
+<p>ROS 2 從 ROS 1 過渡來時，設計核心有兩個：</p>
+<ol>
+<li><strong>DDS（Data Distribution Service）</strong>：取代 ROS 1 的中央 master，做分散式 publish/subscribe。</li>
+<li><strong>executor 模型</strong>：跑在使用者程序裡，負責把 callback 排程到 thread 上。</li>
+</ol>
+<p>這兩件事都是為了「在 Linux 一般情況下能跨機器、跨進程地分發 ROS message」設計的。DDS 預設假設 message 是序列化過的 byte stream；executor 假設 callback 是普通 C++ 函式，跑在 CPU thread 上。整個 message passing 模型的隱含假設是：「<strong>資料的常駐位置是 CPU 可定址的 host memory，跨節點之間做的是 host-to-host 的拷貝或共享記憶體</strong>」。</p>
+<p>這個假設在 2014 年很合理。那時 GPU 加速在 robotics 還是研究用途，sensor 大多是 camera / LiDAR，處理都在 CPU 上，Jetson TX1 才剛出來。但 2026 的物理情境是：</p>
+<ul>
+<li>一台 Jetson Thor 有 2070 TFLOPS FP4 算力、128 GB unified memory、Blackwell GPU</li>
+<li>一條 LiDAR pipeline 從 raw points 到 detection 大概有 5–8 個節點，每個都希望點雲常駐在 GPU</li>
+<li>一條相機 + LiDAR + IMU 的 fusion pipeline 有十幾個節點要跑在 20–60 Hz</li>
+<li>每一次 host ↔ device 的 memcpy，在 1080p / 多 channel LiDAR 的尺寸下都是不可忽略的成本</li>
+</ul>
+<p>換句話說：<strong>ROS 2 的執行模型把資料當作 host memory 上的東西，但 2026 的 robotics workload 是 GPU memory 上的東西。</strong> 你每次跨節點傳遞訊息，都在做一次「device → host → device」的來回搬移。對 1080p RGB 來說是幾百 KB；對 LiDAR 點雲是幾 MB；對 fusion 中間的 tensor 是幾十 MB。乘以 30 Hz、十幾個節點，CPU 整天在做沒意義的記憶體拷貝。</p>
+<p>所有寫過 GPU pipeline 的人都知道，<strong>這種架構的真實瓶頸從來不是計算，而是 host-device traffic。</strong> ROS 2 的 message passing 從設計上就把這個 traffic 內建進了預設路徑。</p>
+<hr />
+<h2 id="nitros-workaround">二、NITROS 是聰明的 workaround，但它的限制也說明了問題的本質</h2>
+<p>NVIDIA 在 ROS 2 Humble（2022）時代就意識到這件事，做法是引入 <strong>NITROS（NVIDIA Isaac Transport for ROS）</strong>。NITROS 不是新的 transport layer，而是<strong>在 ROS 2 的型別系統上層加了兩件事</strong>：</p>
+<h3 id="type-adaptationrep-2007">Type Adaptation（REP-2007）</h3>
+<p>允許節點對外宣稱自己處理的訊息類型，但在內部用一個「對硬體加速友善的格式」存放。例如 <code>sensor_msgs/Image</code> 對外看起來是標準 ROS 訊息，但在 NITROS 節點之間，實際傳遞的是 GPU memory 上的 <code>NitrosImage</code>。這層 type adapter 做的就是：當訊息進入相容的下游節點時，<strong>直接傳指標，不做拷貝</strong>。</p>
+<h3 id="type-negotiationrep-2009">Type Negotiation（REP-2009）</h3>
+<p>讓上下游節點互相宣告自己支援的型別，由框架選一個對雙方都最佳的格式。如果兩端都支援 NITROS 的 GPU type，就走 GPU 路徑；如果下游只懂標準 ROS 訊息，就退回到 CPU 路徑做適配。</p>
+<p>這兩個 REP 是 ROS 2 Humble 上正式進入的標準，是被社群審查通過的——不是 NVIDIA 自己一家的東西。NITROS 是這兩個 REP 的具體實作。</p>
+<p>效果非常實際。NITROS Bridge（用來銜接 ROS 1 與 ROS 2 的版本）在 1080p 影像傳輸上比傳統 bridge 快約 <strong>2.5x</strong>，就是因為它把資料留在 GPU memory，不做跨 CPU process 的拷貝。</p>
+<p>但 NITROS 的限制也說明了問題本質：</p>
+<ol>
+<li><strong>必須跑在同一個 process 內</strong>：要享受 zero-copy，所有 NITROS 節點必須 component-load 進同一個 process。跨 process 你還是要序列化。</li>
+<li><strong>只支援預先定義的 Nitros 型別</strong>：NitrosImage、NitrosTensorList、NitrosPointCloud、NitrosOdometry 等大約 15 種。你自己定義的訊息不能享受。</li>
+<li><strong>目前主要是 C++ API</strong>：Python 節點被排除在這個快速路徑之外。</li>
+<li><strong>NitrosTensorList 才有 managed publisher/subscriber 工具</strong>：其他型別要享受 NITROS 路徑要做更多手工。</li>
+</ol>
+<p>換句話說，NITROS 是 <strong>在 ROS 2 的執行模型之外，搭了一條 GPU-friendly 的旁路</strong>。它證明了路是可行的，但它本質上是 sidecar——你必須走進它的世界、用它的型別、用它的 component container，才能享受。框架自己沒變。</p>
+<p>2026 那個結構性改動就是要解這個問題：<strong>把 GPU-awareness 從 sidecar 抬到 framework 本身</strong>。</p>
+<hr />
+<h2 id="2025-roscon-singapore">三、2025 ROSCon Singapore 真正在發生的事</h2>
+<p>把 NVIDIA 在 2025 年 10 月底 ROSCon（Singapore）宣布的三條東西放在同一張圖上看：</p>
+<pre><code>                   ┌──────────────────────────────────┐
+                   │  Physical AI SIG (under OSRA)    │
+                   │   - real-time determinism        │
+                   │   - GPU local inference          │
+                   │   - telemetry &amp; sim-to-real      │
+                   └────────────┬─────────────────────┘
+                                │ 治理層
+                                ▼
+        ┌────────────────────────────────────────────────┐
+        │   ROS 2 upstream：GPU-aware abstractions       │
+        │   - 框架知道 message 的常駐位置                 │
+        │   - executor 可以排程到非 CPU 計算單元           │
+        │   - 預期擴展到 NPU、integrated GPU、discrete GPU │
+        └────────────┬───────────────────────┬───────────┘
+                     │                       │
+                     ▼                       ▼
+        ┌──────────────────────┐   ┌──────────────────────┐
+        │ NITROS (vendor pkg)  │   │ Greenwave Monitor    │
+        │ Isaac ROS 4.0        │   │ 觀測 GPU/CPU bottle  │
+        │ Jetson Thor          │   │ neck 的工具          │
+        └──────────────────────┘   └──────────────────────┘
+                     │                       │
+                     └───────────┬───────────┘
+                                 ▼
+                       使用者寫的 ROS 2 node
+</code></pre>
+<p>幾個值得拉出來講的點：</p>
+<h3 id="1-physical-ai-sig-osra-nvidia">1. Physical AI SIG 在 OSRA 底下，不是 NVIDIA 內部</h3>
+<p>OSRA 是 Open Source Robotics Alliance，2023 年從 Open Robotics 改組來的、現在統管 ROS / Gazebo / Open-RMF 的法人實體。<strong>「在 OSRA 底下開 Physical AI SIG」意味著這個方向是社群治理的、要走 REP / PR / RFC 流程，不是廠商私下決定。</strong> 這跟 NITROS 那種 vendor package 在本質上不一樣。</p>
+<p>SIG 的三個工作項——real-time determinism、GPU local inference、telemetry &amp; sim-to-real——剛好對應的就是 ROS 2 過去十年都沒解好的三個結構性問題：</p>
+<ul>
+<li>預設 executor 在大圖（&gt;50 node）上 jitter 嚴重</li>
+<li>GPU 推論只有 sidecar，沒有原生抽象</li>
+<li>跨 sim 與 real 的工具鏈沒有統一</li>
+</ul>
+<h3 id="2-gpu-aware-abstractions-ros-2-isaac-ros">2. GPU-aware abstractions 上推到 ROS 2，不是 Isaac ROS</h3>
+<p>新聞稿用詞是「contributing GPU-aware abstractions directly to ROS 2」。directly to ROS 2 這幾個字很重要。意思是這些 PR 會進 <code>ros2/rclcpp</code>、<code>ros2/rmw</code>、可能還有 executor 相關的 repo，而<strong>不是被關在 NVIDIA-ISAAC-ROS 的 namespace 底下</strong>。如果這條路走通，未來不只 NVIDIA GPU、AMD GPU、Qualcomm 的 NPU 都可以用同一套抽象。</p>
+<p>當然，第一批受惠的還是 NVIDIA。但這就是 upstream 賽局——你先寫 reference impl 推上去，後面別人想接就得遵循你定的介面。Linux kernel 的歷史告訴我們這條路廠商會玩很久。</p>
+<h3 id="3-greenwave-monitor">3. Greenwave Monitor 不是隨便附贈的工具</h3>
+<p>很多人看到「topic monitor」會想說，「不就是 <code>ros2 topic hz</code> 加個 TUI？」這就低估了。</p>
+<p><code>ros2 topic hz</code> 是 Python 寫的，跑久了自己會變成 pipeline 的瓶頸——對 30 Hz、十幾個 topic 的系統，你開幾個 <code>topic hz</code> 視窗 CPU 直接吃滿。Greenwave 用 C++ 寫，比 Python 版輕量很多，<strong>而且它提供一個 header-only library</strong>——你可以把它編進自己節點裡，由節點自己直接 publish diagnostics，而不是再開一個 subscriber 去測。</p>
+<p>這代表 NVIDIA 認為「下個世代的 ROS 2 系統會大到 <code>topic hz</code> 撐不住」。當你的圖大到要這種 instrumentation，你的圖也大到 host-device memcpy 會痛——這兩件事是同一個趨勢的兩端。Greenwave 一開始是長在 NITROS 的 diagnostics 裡，後來才獨立出來。這條 lineage 暴露了它真正的目的：<strong>幫 GPU-aware pipeline 量測延遲</strong>。</p>
+<hr />
+<h2 id="lidar">四、對 LiDAR / 點雲工程師意味著什麼</h2>
+<p>我知道讀到這邊很多人會想：好，框架在動，但我是寫 LiDAR 演算法的，這跟我每天 debug 的那個 voxel filter 有關係嗎？</p>
+<p>有關係，而且我會說這條變化會在三個層面影響你接下來兩三年的工作節奏：</p>
+<h3 id="41">4.1. 「在哪一層做拷貝」會變成設計題</h3>
+<p>過去寫 ROS 2 LiDAR pipeline，常見的決策是：</p>
+<ul>
+<li>用 <code>sensor_msgs/PointCloud2</code> 還是自訂 message</li>
+<li>intra-process communication 還是 IPC</li>
+<li>點雲是 ROS message 還是直接 raw PCL</li>
+</ul>
+<p>GPU-aware framework 出來以後，會多一層決定：<strong>這個點雲是 host memory 還是 device memory？下游要不要 device memory？</strong></p>
+<p>對 Adam 這種要做 LiDAR 物件偵測的人來說，這個問題實際上長這樣：</p>
+<ul>
+<li>LiDAR driver 吐出原始 packet，需不需要先到 GPU 再 unpack？</li>
+<li>voxelization 在 GPU 上做、host 上做、還是讓 NITROS-style 抽象自動選？</li>
+<li>detection 結果（3D bounding box）要不要也保留在 GPU 上給下游 tracker？</li>
+<li>tracker 是否需要 CPU host copy 才能做 Kalman filter？</li>
+</ul>
+<p>過去這些問題你只能用 NITROS 或自己手刻來解。上推到 ROS 2 之後，會變成框架原生支援的設計選項。但選錯仍然會痛——而且痛的地方會更隱微（因為框架幫你藏起了拷貝路徑）。</p>
+<h3 id="42">4.2. 觀測工具會變成必修</h3>
+<p>當 host-device 拷貝被框架隱式處理時，你會更難在 source code 裡看出 pipeline 哪邊在搬資料。Greenwave Monitor 這類工具——加上未來 OSRA Physical AI SIG 推的 telemetry 標準——就會變成你 debug LiDAR pipeline 的必備。</p>
+<p>具體會長成什麼樣？我猜會是：</p>
+<ul>
+<li>你的 LiDAR 節點除了 publish topic 之外，還會 publish 一個 <code>~/diagnostics/throughput</code> 與 <code>~/diagnostics/gpu_residency</code>，告訴下游「我的輸出常駐在哪個記憶體域」</li>
+<li>Greenwave dashboard 上每個 topic 旁邊會有一個 CPU/GPU 標記</li>
+<li>profiler 會告訴你「這條 pipeline 平均 7 個節點，其中 3 個有 implicit host copy」</li>
+</ul>
+<p>寫過 PyTorch 的人對這種 pattern 不陌生——<code>tensor.cuda()</code> 你不小心多寫一次，profiler 就會告訴你哪邊在搬。ROS 2 是要走到那個世界。</p>
+<h3 id="43-isaac-framework-vs-vendor-package">4.3. 跟 Isaac 的關係要分清楚：framework vs vendor package</h3>
+<p>對在 Foxconn / NVIDIA 客戶廠房做事的人，這條會特別重要。Isaac ROS 4.0、NITROS、NVIDIA 的 GPU-aware 上推<strong>是兩個不同的東西</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>層</th>
+<th>角色</th>
+<th>你應該怎麼看</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>upstream ROS 2（含 GPU-aware abstractions）</td>
+<td>開源、社群治理、跨硬體中立</td>
+<td>你的 node 設計要靠這層的介面長期穩定</td>
+</tr>
+<tr>
+<td>NITROS / Isaac ROS 4.0</td>
+<td>NVIDIA vendor package</td>
+<td>你可以用，但要意識到你綁定 NVIDIA 硬體</td>
+</tr>
+<tr>
+<td>Jetson Thor</td>
+<td>物理執行平台</td>
+<td>你的 deployment 細節</td>
+</tr>
+</tbody>
+</table>
+<p>大型 EMS / OEM 如果在跑 Isaac AMR + Omniverse 的整套方案（這套組合在台灣供應鏈幾家頭部廠商之間已經是公開討論的方向），他們八成會直接用 NITROS / Isaac ROS。但如果你要寫<strong>會在多個專案、多個客戶、跨幾年都活下去的程式碼</strong>，你要靠的是 upstream ROS 2 那條介面，而不是 vendor 那條。</p>
+<p>這跟「用 CUDA 寫核心 vs 用 cuDNN」的判斷一樣——cuDNN 給你 5x 快，但你被綁死在 NVIDIA。NITROS 同樣，給你 zero-copy，但你的 node 變成 vendor-specific。長期答案是：<strong>核心介面學 upstream，最佳化路徑用 vendor，但保留切換空間</strong>。</p>
+<hr />
+<h2 id="vendor-pull">五、批判：這也是 vendor pull 的故事</h2>
+<p>我盡量讓這篇文章的前四節讀起來很正面，因為從技術角度它就是正面的——ROS 2 確實需要這層改造。但結尾值得提一下另一面：</p>
+<p><strong>這條改動之所以能上推 ROS 2，是因為主要的 push 者就是主要的受惠者。</strong> NVIDIA 寫 reference implementation、推 PR、定義介面、開 SIG。所有後續的 vendor（AMD、Qualcomm、Hailo、Tenstorrent 等）要進這套抽象，都要遵循 NVIDIA 的設計取向。</p>
+<p>OSRA 與 SIG 的存在會讓這個過程有制衡——理論上其他廠商可以推不同實作——但歷史上 upstream 賽局通常是「先送出 reference impl 的人贏了介面定義權」。Wayland 是這樣、io_uring 是這樣、cgroups v2 也是這樣。ROS 2 GPU-aware 抽象大概率也會這樣。</p>
+<p>對使用者（你我）的影響：未來幾年 ROS 2 上的 GPU 路徑會出奇地像 NVIDIA 的 mental model。如果你的工作有可能要跨硬體（AMD ROCm、Qualcomm NPU、Intel ARC），要把這層介面當作「NVIDIA-flavored 的中立化」來看，而不是真正的中立。</p>
+<p>我自己會這樣總結它的時間意義：</p>
+<blockquote>
+<p><strong>2026 是 ROS 2 從「CPU framework + GPU sidecar」過渡到「heterogeneous framework」的元年。這條變化的技術正面意義非常大，值得追；但它同時也是 NVIDIA 把自己的 mental model 寫進開源治理的一次成功 upstream pull。兩件事可以同時成立。</strong></p>
+</blockquote>
+<hr />
+<h2 id="lidar-ros2">結語：給 LiDAR / ROS2 工程師的三條建議</h2>
+<p>如果你跟 Adam 一樣，是寫 LiDAR / 點雲 / ROS 2 C++ 的人，這條變化的具體 action 我會這樣排：</p>
+<ol>
+<li>
+<p><strong>短期（這個月）</strong>：把 <a href="https://ros.org/reps/">REP-2007 / REP-2009</a> 讀過一次。這兩個 REP 是看懂後面所有 GPU-aware 抽象的底層詞彙。不需要寫 NITROS 才需要懂——這是 ROS 2 對「型別」這件事的世界觀變化。</p>
+</li>
+<li>
+<p><strong>中期（兩三個月）</strong>：在你現有的 LiDAR pipeline 上跑一次 <a href="https://github.com/NVIDIA-ISAAC-ROS/greenwave_monitor">Greenwave Monitor</a>。即使你不打算改用 NITROS，這個工具會幫你發現一些你以為很快、其實沒這麼快的節點。EMS / 廠房等大規模部署環境裡，這份資料對 sizing 與後續取捨都很有用。</p>
+</li>
+<li>
+<p><strong>長期（半年到一年）</strong>：追 OSRA Physical AI SIG 的 meeting minutes 與第一批 ROS 2 upstream PR。當 GPU-aware 介面真的進 <code>rclcpp</code> / <code>rmw</code> 時，那會是寫新 node 的時候要選新介面的轉折點。早一點看到 design 提案，比晚一點被介面追著跑划算太多。</p>
+</li>
+</ol>
+<p>至於是不是要立刻把現有的 LiDAR pipeline 改寫成 NITROS——我的答案是<strong>不要</strong>。等 upstream 介面穩定，等 GPU-aware 抽象走完 REP 流程。在那之前，你寫的東西要可移植，要能在 NITROS 與 non-NITROS 之間切換。<strong>先讓你的設計跟上框架的變化，再決定要不要綁定 vendor 路徑</strong>。</p>
+<p>ROS 2 在 2026 變成異質計算友善的框架，這件事的長期影響可能不亞於 ROS 1 → ROS 2 過渡本身。我們會花接下來幾年看它怎麼長。</p>
+<hr />
+<h2 id="_2">來源</h2>
+<ul>
+<li><a href="https://blogs.nvidia.com/blog/roscon-2025-open-framework-robotics">NVIDIA Contributes to Open Frameworks for Next-Generation Robotics Development — NVIDIA Blog</a></li>
+<li><a href="https://quantumzeitgeist.com/nvidia-and-osra-gpu-aware-ros-2-development/">NVIDIA and OSRA Pioneer GPU-Aware ROS 2 Development — Quantum Zeitgeist</a></li>
+<li><a href="https://cloudnews.tech/nvidia-pushes-open-robotics-standards-contributions-to-ros-2-new-physical-ai-sig-open-source-tools-and-the-release-of-isaac-ros-4-0-on-jetson-thor/">NVIDIA Pushes Open Robotics Standards (Isaac ROS 4.0, Physical AI SIG) — Cloud News</a></li>
+<li><a href="https://developer.nvidia.com/blog/improve-perception-performance-for-ros-2-applications-with-nvidia-isaac-transport-for-ros/">Improve Perception Performance for ROS 2 Applications with NVIDIA Isaac Transport for ROS — NVIDIA Technical Blog</a></li>
+<li><a href="https://developer.nvidia.com/blog/boosting-custom-ros-graphs-using-nvidia-isaac-transport-for-ros/">Boosting Custom ROS Graphs using NVIDIA Isaac Transport for ROS — NVIDIA Technical Blog</a></li>
+<li><a href="https://nvidia-isaac-ros.github.io/concepts/nitros/index.html">NITROS Concepts — Isaac ROS Docs</a></li>
+<li><a href="https://github.com/NVIDIA-ISAAC-ROS/greenwave_monitor">Greenwave Monitor — GitHub</a></li>
+<li><a href="https://discourse.openrobotics.org/t/nvidias-greenwave-monitor-a-tool-for-high-performance-topic-monitoring-and-diagnostics/50477">Greenwave Monitor Announcement — ROS Discourse</a></li>
+<li><a href="https://ros.org/reps/rep-2007.html">REP-2007 (Type Adaptation)</a></li>
+<li><a href="https://ros.org/reps/rep-2009.html">REP-2009 (Type Negotiation)</a></li>
+<li><a href="https://dig.watch/updates/nvidia-boosts-open-source-robotics-with-new-ros-2-and-physical-ai-contributions">NVIDIA Boosts Open-Source Robotics with new ROS 2 and Physical AI contributions — Digital Watch</a></li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

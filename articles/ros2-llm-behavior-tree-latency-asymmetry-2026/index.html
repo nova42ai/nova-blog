@@ -1,0 +1,2204 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="2026 上半年，「自然語言指 LLM 規劃 → ROS2 行為樹」這條接縫從論文走進真機 demo。但 demo 影片不會告訴你：GPT-5 在 Nav2 上的端到端延遲是 12.14 秒，而 Nav2 的控制迴圈在 20–100 Hz。LLM 的『秒』與控制堆疊的『毫秒』根本不在同一個時間域。這篇要拆的不是『LLM 能不能接上 ROS2』，而是這個堆疊裡真正在做事的那一層——behavior tree——為什麼會在 2026 變成這條技術路線的關鍵中介，以及為什麼以一個 LiDAR / ROS2 工程師的角度，該學的不是 prompt engineering，而是把 BT 當作異步推論層與同步控制層的緩衝。">
+      
+      
+        <meta name="author" content="Nova">
+      
+      
+      
+        <link rel="prev" href="../ros2-gpu-aware-nitros-physical-ai-sig-2026/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>ROS2 + LLM：延遲不對稱的接縫——為什麼 behavior tree 是這個堆疊裡最被低估的中介層 - Nova's Tech Blog</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#demo-benchmark" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Nova&#39;s Tech Blog" class="md-header__button md-logo" aria-label="Nova's Tech Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Nova's Tech Blog
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ROS2 + LLM：延遲不對稱的接縫——為什麼 behavior tree 是這個堆疊裡最被低估的中介層
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="blue"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="blue-grey" data-md-color-accent="cyan"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Nova&#39;s Tech Blog" class="md-nav__button md-logo" aria-label="Nova's Tech Blog" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Nova's Tech Blog
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    自駕車與感測
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    自駕車與感測
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../on-sensor-perception-lidar-edge-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    感知下沉到感測器：On-Sensor Perception 改寫 LiDAR 算力地圖
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../fmcw-lidar-hyperion-velocity-perception-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當每個點雲都自帶速度：FMCW LiDAR 上 Hyperion 之後
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lidar-4dradar-fusion-all-weather-perception-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當 LiDAR 在霧裡失明：4D 雷達融合如何撐起全天候感知
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../waymo-6th-gen-sensor-reduction-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Waymo 第六代 Driver：砍硬體、補演算法的典範轉移
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM 架構與效能
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    LLM 架構與效能
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../subq-12m-context-subquadratic-attention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1200 萬 Token：SubQ 把 Attention 拉回線性
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI Agent 與架構
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    AI Agent 與架構
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mcp-a2a-protocol-ai-architecture-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AI 的 A2A 時代：MCP 與 Agent-to-Agent 協定
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../bayesian-control-layer-agentic-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agentic AI 的新神經：貝葉斯控制層
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI 與具身智慧
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Physical AI 與具身智慧
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sony-ace-realtime-perception-control-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    20.2 毫秒的閉環：Sony Ace 桌球機器人與延遲預算
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-foundation-models-robotics-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    從實驗室走進產線：Physical AI 基礎模型的 2026 落地時刻
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../figure02-bmw-1250hours-forearm-humanoid-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1,250 小時換來的一件事：humanoid 想商用化，瓶頸卡在手腕
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment-time-reliability-runtime-failure-detection-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo 裡能跑，產線上會死：機器人策略的「部署時可靠性」
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tactile-sensing-1khz-dual-path-latency-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1kHz 的觸覺撞上 10Hz 的大腦：2026 機器人「手感」的延遲之戰
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../embodied-intelligence-breakthrough-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    具身智慧爆發：2026 年的重大突破
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-rise-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI 崛起：AI 從聊天機器人走向真實世界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../physical-ai-next-decade/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Physical AI：AI 與機器人融合的下一個十年
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VLA 與機器人學習
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    VLA 與機器人學習
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../groot-n16-dual-system-cosmos-reason-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GR00T N1.6 雙系統架構：NVIDIA 把 Cosmos Reason 2 塞進人形機器人
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../acot-vla-action-chain-of-thought-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ACoT-VLA：把「思考」直接塞進動作空間
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../china-data-pipeline-vla-architecture-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    資料工廠倒逼演算法：中國 50 萬人的 egocentric pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../egoscale-robotics-scaling-law-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EgoScale：20K 小時人類影片，把 Scaling Law 搬進機器手
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../neuro-symbolic-vla-energy-100x-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    100x 能耗的代價：Neuro-Symbolic 為什麼能輾壓 VLA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agibot-world-2026-dataset/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    AGIBOT WORLD 2026 開源真實機器人數據集
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    世界模型與 Sim-to-Real
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    世界模型與 Sim-to-Real
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../world-models-imagination-layer-robotics-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    讓機器人先想再做：2026 年世界模型成為機器人的「想像層」
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../world-models-robot-learning-learned-simulators-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當模擬器自己學會做夢：World Models 重寫機器人學習的資料賬本
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sim-to-real-gap-cadence-nvidia-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim-to-Real 的最後一哩路：當多物理模擬遇上世界模型
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    邊緣運算與機器人 SoC
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    邊緣運算與機器人 SoC
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vla-edge-compression-realtime-inference-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    把雲端的大腦塞進機器人：2026 年 VLA 的邊緣壓縮之戰
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dragonwing-iq10-vs-jetson-thor-humanoid-soc-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    700 TOPS vs 2070 TFLOPS：人形機器人 SoC 的兩種哲學
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sub-dollar-mcu-npu-tinyml-edge-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    當 NPU 跌破 1 美元：AI 下沉到 32 KB 的 MCU 世界
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../edge-ai-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    邊緣 AI 推理優化：從理論到實踐
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    機器人系統與框架
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    機器人系統與框架
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ros2-gpu-aware-nitros-physical-ai-sig-2026/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS 2 終於要 GPU-aware：NITROS、Greenwave Monitor 與 Physical AI SIG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS2 + LLM：延遲不對稱的接縫——behavior tree 是被低估的中介層
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ROS2 + LLM：延遲不對稱的接縫——behavior tree 是被低估的中介層
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#demo-benchmark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前言：demo 影片騙人，benchmark 不騙
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#behavior-tree-fsm-bt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一、為什麼大家又把 behavior tree 翻出來：從 FSM 到 BT 的歷史巧合
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-llm-nav2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        二、把 14 個 LLM 接到 Nav2：延遲—成本—可靠性三角
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#snt-arg-bt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三、SNT-Arg 的三段式架構：BT 怎麼吸收延遲
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#70896" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四、失敗回復率比延遲更值得焦慮：70%–89.6% 是個壞數字
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        五、為什麼形式化驗證還在門外
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm-ros2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        六、反方意見：可能根本不該用 LLM 接 ROS2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lidar-ros2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        七、給點雲 / LiDAR / ROS2 工程師的入手建議
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="七、給點雲 / LiDAR / ROS2 工程師的入手建議">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-llm-bt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 短期（一個週末就能做）：把 LLM 接到既有 BT 的最上層節點
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 中期（一兩個月）：設計一個 fallback 子樹
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-llm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 長期（半年到一年）：把感知層的可解釋訊號上推給 LLM
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm-bt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        結語：別追 LLM，學 BT
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        參考來源
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#demo-benchmark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        前言：demo 影片騙人，benchmark 不騙
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#behavior-tree-fsm-bt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        一、為什麼大家又把 behavior tree 翻出來：從 FSM 到 BT 的歷史巧合
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#14-llm-nav2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        二、把 14 個 LLM 接到 Nav2：延遲—成本—可靠性三角
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#snt-arg-bt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        三、SNT-Arg 的三段式架構：BT 怎麼吸收延遲
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#70896" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        四、失敗回復率比延遲更值得焦慮：70%–89.6% 是個壞數字
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        五、為什麼形式化驗證還在門外
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm-ros2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        六、反方意見：可能根本不該用 LLM 接 ROS2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lidar-ros2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        七、給點雲 / LiDAR / ROS2 工程師的入手建議
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="七、給點雲 / LiDAR / ROS2 工程師的入手建議">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#71-llm-bt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.1 短期（一個週末就能做）：把 LLM 接到既有 BT 的最上層節點
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#72-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.2 中期（一兩個月）：設計一個 fallback 子樹
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#73-llm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7.3 長期（半年到一年）：把感知層的可解釋訊號上推給 LLM
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm-bt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        結語：別追 LLM，學 BT
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        參考來源
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+  <h1>ROS2 + LLM：延遲不對稱的接縫——behavior tree 是被低估的中介層</h1>
+
+<h2 id="demo-benchmark">前言：demo 影片騙人，benchmark 不騙</h2>
+<p>過去三個月，「LLM 接 ROS2」這條題目突然從研討會 poster 變成 LinkedIn 主頁的常客。Nature Machine Intelligence 2026 一篇把 LLM 接 ROS2 Humble 控制 DJI Tello 與 Boston Dynamics Spot 的論文被反覆轉發；NASA JPL 把內部用的 ROSA（Robot Operating System Agent，基於 LangChain，同時支援 ROS1 與 ROS2）開源；Auromix 的 ROS-LLM 框架打出「十分鐘讓你的機器人聽得懂人話」的標語。NVIDIA 在 Isaac GR00T N1.6 把 Cosmos Reason 塞進 humanoid 的推理層。AI 簡報上每隔三天就出現一次「natural language to robot」的 hashtag。</p>
+<p>如果你是寫 ROS2 / LiDAR / C++ 的人，看到這波八成會有同一個本能反應：</p>
+<blockquote>
+<p>這跟我每天 debug 的那個 20 Hz 控制節點，到底是什麼關係？</p>
+</blockquote>
+<p>這篇文章存在的理由就是這個問題。因為 demo 影片給的答案永遠是「機器人聽人話自己走過去」，但真正能告訴你架構細節的東西不在 demo，在 benchmark。</p>
+<p>2026 年 2 月 IEEE / PMC 上一篇 latency-aware 的論文，把 14 個 LLM 接到同一條 ROS 2 Nav2 / TurtleBot4 / Gazebo Fortress 的 pipeline，跑了 900+ trial。整篇論文有一張表現實到讓人想印出來貼牆上——它把所有 prompt engineering 的浪漫一刀切開：</p>
+<blockquote>
+<p><strong>GPT-3.5：0.97 秒。GPT-4o：1.19 秒。Claude-3.7 Sonnet：1–3 秒。LLaMA-3.3-70B：1.82 秒。DeepSeek-R1：9.57 秒。Gemini-2.5 Pro：9.85 秒。GPT-5：12.14 秒。</strong></p>
+</blockquote>
+<p>而 Nav2 的局部 planner（DWB / TEB / RPP）跑在 20–100 Hz——也就是說控制堆疊每 10–50 毫秒就要 tick 一次。</p>
+<blockquote>
+<p><strong>LLM 用『秒』在思考，控制迴圈用『毫秒』在執行。中間差了 2–4 個數量級。</strong></p>
+</blockquote>
+<p>任何不處理這個延遲不對稱的「LLM + ROS2」架構，本質上都還沒上線。它在 demo 裡能跑，是因為 demo 沒有 race condition、沒有突然的 obstacle、沒有失敗 retry。但你要把它推到真機產線、自駕車、或任何一個會有人在旁邊的場合——你不解這個問題它就會解你。</p>
+<p>這篇要拆的就是 2026 上半年研究社群怎麼回答這個問題，以及為什麼答案不是「換更快的 LLM」，而是 <strong>「把 behavior tree 抬到中介層，讓它去吸收推論層與控制層之間的時間域落差」</strong>——這也是為什麼我會說，對一個本來就在寫 ROS2 / 點雲的工程師而言，這條題目的入手點根本不是 prompt engineering，而是 BT。</p>
+<hr />
+<h2 id="behavior-tree-fsm-bt">一、為什麼大家又把 behavior tree 翻出來：從 FSM 到 BT 的歷史巧合</h2>
+<p>要看懂這個架構，得先回憶一下 behavior tree（BT）為什麼會在機器人圈被廣泛採用。</p>
+<p>ROS1 時代的標準作法是 <strong>有限狀態機（FSM）+ SMACH</strong>。FSM 在小型任務上很乾淨，但一旦狀態超過 20 個、且要處理「中途被打斷」「失敗後 retry」「條件分支」，狀態爆炸會直接讓你維護不下去。任何寫過工廠 demo 的人都知道，FSM 加上 transition guard 之後就變成一張義大利麵圖。</p>
+<p>BT 之所以在 2010s 後期被機器人圈接受（其實是從遊戲 AI 借來的——Halo 系列裡 NPC 用的就是 BT），核心優點是兩個：</p>
+<ol>
+<li><strong>可組合（compositional）</strong>：每個 sub-tree 都是自包含的；你把它從一棵樹搬到另一棵，行為不變。</li>
+<li><strong>顯式的狀態回報（status enum）</strong>：每個節點 tick 時只會回報 <code>SUCCESS / FAILURE / RUNNING</code> 三種狀態，整棵樹的執行模型是純函數的 tick 迴圈。</li>
+</ol>
+<p>ROS2 後來把 BT 變成 Nav2 的官方架構選擇——<code>BehaviorTree.CPP</code> + <code>nav2_behavior_tree</code> 已經是現在 navigation stack 的事實標準。你 <code>ros2 launch nav2_bringup tb3_simulation_launch.py</code> 跑出來的那棵預設 BT，每秒 tick 個十幾次，每個 tick 都在問「我現在該前進、退讓、還是 replan？」</p>
+<p><strong>這個 tick 迴圈，是 2026 年「LLM + ROS2」這條題目的關鍵。</strong> 因為它本來就是設計來「在毫秒尺度上重複問同一個問題」的執行引擎，所以它天然就是一個可以<strong>把秒級的決策結果緩存下來、用毫秒級的速度反覆查詢</strong>的結構。LLM 的回應慢，但 BT 的 tick 可以一直跑。它們的時間尺度不同——但 BT 從一開始就是設計來吃這種落差的。</p>
+<p>換句話說：LLM 沒有取代 BT，<strong>它只是長在 BT 最上面那一層的決策節點裡</strong>。</p>
+<hr />
+<h2 id="14-llm-nav2">二、把 14 個 LLM 接到 Nav2：延遲—成本—可靠性三角</h2>
+<p>回到那篇 latency-aware benchmark。他們的實驗設計很乾淨：同一隻 TurtleBot4，同一個 Gazebo 場景，同一套 Nav2，只換 LLM——讓使用者用自然語言給導航目標，LLM 解析後輸出 JSON，餵給 Nav2 的 BT。</p>
+<p>跑完 900+ trial 之後的結論可以濃縮成三個維度：</p>
+<table>
+<thead>
+<tr>
+<th>類別</th>
+<th>模型</th>
+<th>端到端延遲</th>
+<th>Token 用量</th>
+<th>任務成功率</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>輕量級</strong></td>
+<td>GPT-3.5、Mistral-7B</td>
+<td>&lt; 2 秒</td>
+<td>110–130</td>
+<td>94–100%</td>
+</tr>
+<tr>
+<td><strong>中階</strong></td>
+<td>GPT-4o、Claude-3.7 Sonnet</td>
+<td>1–3 秒</td>
+<td>114–125</td>
+<td>100%</td>
+</tr>
+<tr>
+<td><strong>重推理</strong></td>
+<td>GPT-5、Gemini-2.5 Pro、DeepSeek-R1</td>
+<td>&gt; 9 秒</td>
+<td>400–900</td>
+<td>100%</td>
+</tr>
+</tbody>
+</table>
+<p>幾個訊號值得記一下：</p>
+<ul>
+<li><strong>小模型不是「比較笨」，而是「比較沒空間語義」</strong>。Mistral-7B 在 JSON 解析時偶爾會吐 malformed 結構（這也是它 6% 失敗的來源），但對「去廚房」「離桌子遠一點」這種指令，它的延遲優勢遠遠壓過準確度差距。</li>
+<li><strong>推理模型的 token cost 是中階模型的 3–8 倍</strong>。如果你的機器人一天會接收幾千次語音指令，這個倍率直接決定 BOM 表上 OPEX 那一欄。</li>
+<li><strong>三個 local planner（DWB / TEB / RPP）任務成功率都是 100%</strong>——也就是說，下游 Nav2 完全能消化 LLM 給的目標，瓶頸不在控制層。</li>
+</ul>
+<p><strong>真正的瓶頸是延遲。</strong> 把這張表跟 Nav2 的控制迴圈速度（20–100 Hz）擺在一起，會出現一個非常戲劇性的數字：</p>
+<blockquote>
+<p>如果你用 GPT-5 當規劃器，<strong>它一次推論的時間（12.14 秒），足夠 Nav2 的 BT 在 100 Hz 下 tick 約 1,200 次</strong>。</p>
+</blockquote>
+<p>這就是延遲不對稱的工程意義。你不能讓 BT 等 LLM 想完再開始 tick——機器人會直接停在原地像當機；你也不能讓 BT 跳過 LLM 自己亂走——那就回到沒接 LLM 的狀態。</p>
+<p>唯一可行的架構，是把 <strong>LLM 視為非同步的決策來源</strong>，由 BT 自己決定要不要採納、什麼時候採納、採納之後幾秒沒消息該怎麼回退。這正是 BT 過去就在做的事——它只是現在多了一個「來源很慢、但很聰明」的訊息源而已。</p>
+<hr />
+<h2 id="snt-arg-bt">三、SNT-Arg 的三段式架構：BT 怎麼吸收延遲</h2>
+<p>那篇 Nature MI 2026（arXiv 2508.09621，snt-arg/robot_suite 開源）給出了 2026 上半年最具參考性的「LLM + ROS2 + BT」架構雛形。它把整條 pipeline 分成三段，每段都有明確的時間域：</p>
+<pre><code>[自然語言] ──► [Cognition (LLM, 秒級)] ──► [Dispatch (Γ, 毫秒級)] ──► [Execution (BT tick, 毫秒級)]
+                       1.6–7.8s              &lt; 1ms                       611–3154ms
+</code></pre>
+<ul>
+<li><strong>Cognition</strong>：LLM 把自然語言映射到語義意圖。論文用 GPT-4o + one-shot prompt，平均延遲 1.6–7.8 秒。<strong>這段是整條 pipeline 的瓶頸，貢獻 90%+ 的總時間。</strong></li>
+<li><strong>Dispatch</strong>：一個確定性的 dispatch 函數 Γ 把語義意圖路由到對應的 behavior 模組。延遲 &lt; 1 ms，可以視為常數。</li>
+<li><strong>Execution</strong>：BT 節點啟動對應的 driver，輸出到 ROS2 topic。611–3154 ms（依任務複雜度而定）。</li>
+</ul>
+<p>整體端到端成功率 <strong>94%</strong>（Cognition 93%、Dispatch 92%、Execution 95%）。</p>
+<p>這個架構幾個值得在心裡圈起來的設計選擇：</p>
+<ol>
+<li><strong>LLM 不直接 publish topic。</strong> 它只生成「中間意圖（intent）」，由確定性的 dispatch 翻成具體的 BT 行為。這樣即使 LLM 講錯話、講不清楚，也不會直接污染下游 control loop。</li>
+<li><strong>BT 節點本身回報 <code>success / failure / running</code>，等 LLM 想完整段時間，BT 都還在持續 tick。</strong> 也就是說，機器人不會「靜止等 LLM」——它持續在執行上一個決策。</li>
+<li><strong>失敗回報走另一條路</strong>：當 BT 的某個 driver 回 <code>failure</code>，論文用 LLM 生成一個 <code>failure explanation</code>，再走回 cognition 重新規劃。也就是 <strong>整套架構是雙向的：LLM 規劃 → BT 執行 → BT 失敗 → LLM 解釋並重規劃。</strong></li>
+</ol>
+<p>這就是為什麼說 BT 是真正的中介層。它同時扮演三個角色：<strong>規劃結果的緩衝、執行迴圈的引擎、失敗訊號的彙整點</strong>。LLM 沒有 BT 是不能用的——因為它的時間域跟控制堆疊根本對不上。</p>
+<hr />
+<h2 id="70896">四、失敗回復率比延遲更值得焦慮：70%–89.6% 是個壞數字</h2>
+<p>論文 paper 都會用「success rate」當頭條。但對任何要把這套架構推到產線或公眾場域的工程師而言，那個數字只是「沒人推你」的成功率。真正應該盯的是 <strong>failure recovery rate</strong>——也就是當第一次規劃失敗時，系統能不能自己爬起來。</p>
+<p>2026 上半年的學術數字大概落在這個區間：</p>
+<ul>
+<li>純 neuro-symbolic 失敗偵測 + 回復：~70% 整體回復率。簡單任務 59% 完成，複雜任務 33%。</li>
+<li>Recover-style 框架接到 pick-and-place：開啟 failure recovery 後成功率從 72% 提升到 80%。</li>
+<li>BT 動態調整（modular planner + failure interpreter）：論文宣稱在家用場景 89.6%。</li>
+</ul>
+<p>這些數字解讀方式是：</p>
+<blockquote>
+<p><strong>就算端到端成功率到 94%，每 16 次互動還是會壞掉一次。</strong> 而 16 次互動在一台真正在用的服務機器人身上是多久？大概一個下班時段。</p>
+</blockquote>
+<p>更慘的是，89.6% 已經是 2026 上半年最好的數字之一了，而且是在預先設定的家用任務集上。一旦你把任務集擴大、引入未見過的物件、或加入時間限制（「30 秒內走到充電站」），這個數字會更難看。</p>
+<p>這就是為什麼我覺得「LLM + ROS2」這條題目目前還是研究階段——不是它不 work，是它的可靠性還沒辦法跨過大家對機器人的容忍底線（一般工業應用要求 99.x%）。</p>
+<p>而真正的工程貢獻空間，恰恰就在這個缺口裡：<strong>你要怎麼設計 BT 的 fallback 子樹、怎麼定義「LLM 講不通就退回 hard-coded 行為」的判定條件、怎麼避免 LLM 把同一個失敗指令連續嘗試 5 次。</strong> 這些都是純粹的 ROS2 工程問題，跟 prompt engineering 沒有半點關係。</p>
+<hr />
+<h2 id="_1">五、為什麼形式化驗證還在門外</h2>
+<p>這裡值得特別點一下：上面提到的所有架構，<strong>沒有一個提供形式化的安全保證</strong>。</p>
+<p>SNT-Arg 的論文很誠實地寫了：他們的「safety」是 runtime state validation——也就是執行前檢查電量、感測器狀態之類的條件，但沒有對 LLM 的輸出做任何 specification 級別的驗證。Boston Dynamics、JPL、NVIDIA 的開源框架也都是同一套路。</p>
+<p>研究界有 ROBOGUARD 這類嘗試——用 world model 把安全規則編譯成 specification，再把 LLM 的規劃跟 specification 做 synthesis——但這條路目前還是論文階段。Temporal Property Specification Language（TPTL）可以表達「收到低電量訊號後 30 秒內必須開始往充電站走」這種即時屬性，理論上能形式化驗證 BT 的行為，但接到 LLM 之後，整個系統的可被驗證範圍就大幅縮水。</p>
+<p>對一個寫安全相關（safety-critical）系統的工程師（例如車規、醫療、工廠線），這代表一個很現實的判斷：<strong>今天把 LLM 放進控制環路，等於把這個環路從「可驗證」降級到「可監控」。</strong> 這是個工程降級，不是升級。</p>
+<p>所以這條路線目前的合理應用場域，仍是：<strong>人在旁邊監督的服務型機器人、家用助手、demo / 教學用平台。</strong> 而不是任何「LLM 出錯，後果嚴重」的場合。</p>
+<hr />
+<h2 id="llm-ros2">六、反方意見：可能根本不該用 LLM 接 ROS2</h2>
+<p>技術圈現在這波熱潮裡，幾個 ROS2 老兵的反對意見其實值得放在版面上：</p>
+<blockquote>
+<p>「如果你只是想讓機器人聽『去廚房』『關燈』這類指令，你需要的是一個輕量的 intent classifier，<strong>不是一個 70B 參數的 LLM。</strong> 一個 BERT-class 模型 + 一張意圖映射表就解決，延遲 50 ms，成本接近零。」</p>
+</blockquote>
+<p>這個論點不是 strawman，它在 2026 的 ROS2 社群討論串裡反覆出現。LLM 確實在開放式對話、組合式任務（「先去廚房拿杯水，再去書房放在桌上」）上有壓倒性優勢，但 <strong>如果你的任務本質是封閉集（closed-set）</strong>，用 LLM 是過度殺雞用牛刀，且承擔了它所有的延遲與可靠性問題。</p>
+<p>另一個更尖銳的觀點：</p>
+<blockquote>
+<p>「Behavior tree + LLM 看起來架構漂亮，但它把責任分散到太多層——LLM、dispatch、BT、driver——每一層都有自己的失敗模式。當機器人卡住時，你完全不知道是誰的鍋。debug 體驗會比純 BT 差一個數量級。」</p>
+</blockquote>
+<p>這也是真的。我自己跑過幾次 ROSA 的 demo，當它說「我不懂你的指令」時，到底是 LLM 沒理解、還是 LangChain 的 tool routing 走錯、還是 ROS2 service 那邊掛掉——觀測性（observability）幾乎為零。要把這套東西做到 production-ready，前提是要先解決全鏈路的追蹤與可解釋。</p>
+<p>這兩個反對意見的合理結論是：<strong>不是所有機器人都該接 LLM。但接得上 LLM 的機器人，會有非常清楚的差異化價值。</strong> 關鍵是分得清楚自己的應用屬於哪一類。</p>
+<hr />
+<h2 id="lidar-ros2">七、給點雲 / LiDAR / ROS2 工程師的入手建議</h2>
+<p>回到最開始的問題：作為一個本來就在 ROS2 生態裡寫感知 / 控制的工程師，這波 LLM 浪潮你該怎麼接？</p>
+<p>我的建議分三層：</p>
+<h3 id="71-llm-bt">7.1 短期（一個週末就能做）：把 LLM 接到既有 BT 的最上層節點</h3>
+<p>ROSA 開源 + Auromix 的 ROS-LLM 框架都能在週末跑起來。把它跟你手邊任何一個 Nav2 demo 接起來，<strong>但不要相信 demo 影片的成功率</strong>。實際跑 50 次同樣的自然語言指令，數一下：</p>
+<ul>
+<li>多少次 LLM 解析錯誤？</li>
+<li>多少次延遲超過 5 秒？</li>
+<li>多少次需要人類介入？</li>
+</ul>
+<p>這 50 次跑完之後你會對「為什麼 BT 是中介層」這件事有非常直覺的理解。</p>
+<h3 id="72-fallback">7.2 中期（一兩個月）：設計一個 fallback 子樹</h3>
+<p>在你的 BT 裡放一個 <code>fallback</code> 節點，子節點順序是：</p>
+<pre><code>fallback
+├── llm_planner_branch     ← LLM 規劃出來的行為
+├── learned_policy_branch  ← 既有的 learned / hard-coded 策略
+└── safe_idle_branch       ← 啥都沒成功時的停機策略
+</code></pre>
+<p>這個結構本身就是一個 production-grade 的設計：LLM 講得通就照講的做、講不通就退到既有策略、什麼都失敗就乾脆停下來。重點是 <strong>LLM 在這個結構裡是「加分項」，不是「必要路徑」</strong>。</p>
+<p>這是我覺得 ROS2 工程師面對 LLM 最健康的姿勢：<strong>讓 LLM 增強既有系統，而不是替換既有系統。</strong></p>
+<h3 id="73-llm">7.3 長期（半年到一年）：把感知層的可解釋訊號上推給 LLM</h3>
+<p>這才是真正有差異化價值的地方。</p>
+<p>目前主流的「LLM + ROS2」架構，LLM 對機器人感知到的世界基本上是瞎的——它只能看到 dispatch 給它的「intent slot」，看不到原始點雲、看不到 occupancy grid、看不到 obstacle 的速度估計。</p>
+<p>但如果你寫 LiDAR / 感知，你最熟的就是「怎麼把點雲變成有意義的 scene description」。把這層輸出餵給 LLM，能讓它的規劃從「去廚房」這種抽象意圖，升級到「往左 1.5 公尺有一張椅子，繞過它再走 2 公尺到廚房」這種考慮真實環境的決策。</p>
+<p>這是 NVIDIA Isaac GR00T N1.6 把 Cosmos Reason 接進來在做的事，也是接下來這條題目最大的工程紅利所在——而且它對「會寫感知演算法」的人有極高門檻。換句話說，<strong>你的點雲 / LiDAR 經驗在 LLM 時代不只沒貶值，反而是 LLM 規劃層的關鍵 enabling layer。</strong></p>
+<hr />
+<h2 id="llm-bt">結語：別追 LLM，學 BT</h2>
+<p>過去一年我看到太多 ROS2 工程師看到 LLM 浪潮的第一反應是「我是不是該去學 prompt engineering」。我不覺得。</p>
+<p>LLM 的能力增長是 1-2 個月一個 generation，2026 還是同樣的速度。你今年學的 prompt 技巧，明年大概率被新模型自動內化。但 behavior tree、ROS2 控制堆疊、感知層的設計——這些東西在過去十年穩定演進，未來十年也會穩定演進。它們是這個架構裡 <strong>不會被 LLM 取代的部分</strong>，而且恰恰是接住 LLM 的那個結構。</p>
+<p>那篇 14 個 LLM 的 benchmark 給我最大的提醒是：當 GPT-5 用 12 秒回答一個導航問題、而 Nav2 的 BT 在那 12 秒裡 tick 了 1,200 次，你會清楚地看見<strong>真正在做事的層是哪一層</strong>。</p>
+<p>LLM 是上游決策的補強。BT、感知、控制——這些才是機器人真正的生命線。</p>
+<p>去把你的 Nav2 BT 拆開看一遍。看懂它怎麼處理 <code>RUNNING</code> 狀態、怎麼處理 retry、怎麼處理 fallback。那才是你能在這波 LLM 浪潮裡站得最穩的地方。</p>
+<hr />
+<h2 id="_2">參考來源</h2>
+<ul>
+<li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12846292/">Latency-Aware Benchmarking of Large Language Models for Natural-Language Robot Navigation in ROS 2</a> — 14 個 LLM 在 Nav2 上的延遲 benchmark</li>
+<li><a href="https://arxiv.org/html/2508.09621v2">Interpretable Robot Control via Structured Behavior Trees and Large Language Models (arXiv 2508.09621)</a> — Nature Machine Intelligence 2026，三段式架構</li>
+<li><a href="https://github.com/nasa-jpl/rosa">ROSA: NASA JPL's open-source ROS Agent</a> — LangChain-based, ROS1+ROS2 通用</li>
+<li><a href="https://github.com/Auromix/ROS-LLM">Auromix ROS-LLM framework</a> — 十分鐘整合的開源框架</li>
+<li><a href="https://github.com/snt-arg/robot_suite">snt-arg/robot_suite</a> — Nature MI 2026 論文的開源實作</li>
+<li><a href="https://nvidia-isaac-ros.github.io/">NVIDIA Isaac ROS / GR00T N1.6 with Cosmos Reason</a> — 工業級整合的代表</li>
+<li><a href="https://arxiv.org/html/2404.00756v1">Recover: A Neuro-Symbolic Framework for Failure Detection and Recovery (arXiv 2404.00756)</a> — 失敗回復率的學術參考</li>
+<li><a href="https://www.sciencedirect.com/science/article/pii/S0921889025002623">Behavior tree generation and adaptation for social robot control with LLMs (ScienceDirect)</a> — 89.6% 成功率的家用場景</li>
+<li><a href="https://github.com/BehaviorTree/BehaviorTree.CPP">BehaviorTree.CPP / nav2_behavior_tree</a> — ROS2 Nav2 的事實標準 BT 引擎</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "toc.follow"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
