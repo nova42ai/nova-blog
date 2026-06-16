@@ -17,33 +17,51 @@ theme:
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - toc.follow
 
 nav:
   - Home: index.md
-  - Articles:
-    - 當每個點雲都自帶速度：FMCW LiDAR 上 Hyperion 之後，整條 perception pipeline 要重寫: articles/fmcw-lidar-hyperion-velocity-perception-2026.md
-    - 當 NPU 跌破 1 美元：AI 下沉到 32 KB 的 MCU 世界: articles/sub-dollar-mcu-npu-tinyml-edge-2026.md
-    - 1kHz 的觸覺撞上 10Hz 的大腦：2026 機器人「手感」的延遲之戰: articles/tactile-sensing-1khz-dual-path-latency-2026.md
-    - 把雲端的大腦塞進機器人：2026 年 VLA 的邊緣壓縮之戰: articles/vla-edge-compression-realtime-inference-2026.md
-    - 當 LiDAR 在霧裡失明：4D 雷達融合如何撐起全天候感知: articles/lidar-4dradar-fusion-all-weather-perception-2026.md
-    - Demo 裡能跑，產線上會死：機器人策略的「部署時可靠性」: articles/deployment-time-reliability-runtime-failure-detection-2026.md
-    - 當模擬器自己學會做夢：World Models 如何重寫機器人學習的資料賬本: articles/world-models-robot-learning-learned-simulators-2026.md
-    - 20.2 毫秒的閉環：Sony Ace 桌球機器人與延遲預算: articles/sony-ace-realtime-perception-control-2026.md
-    - 從實驗室走進產線：Physical AI 基礎模型的 2026 落地時刻: articles/physical-ai-foundation-models-robotics-2026.md
+  - 自駕車與感測:
     - 感知下沉到感測器：On-Sensor Perception 改寫 LiDAR 算力地圖: articles/on-sensor-perception-lidar-edge-2026.md
-    - Sim-to-Real 的最後一哩路：當多物理模擬遇上世界模型: articles/sim-to-real-gap-cadence-nvidia-2026.md
-    - EgoScale：20K 小時人類影片，把 Scaling Law 搬進機器手: articles/egoscale-robotics-scaling-law-2026.md
-    - 700 TOPS vs 2070 TFLOPS：人形機器人 SoC 的兩種哲學: articles/dragonwing-iq10-vs-jetson-thor-humanoid-soc-2026.md
-    - 100x 能耗的代價：Neuro-Symbolic 為什麼能輾壓 VLA: articles/neuro-symbolic-vla-energy-100x-2026.md
+    - 當每個點雲都自帶速度：FMCW LiDAR 上 Hyperion 之後: articles/fmcw-lidar-hyperion-velocity-perception-2026.md
+    - 當 LiDAR 在霧裡失明：4D 雷達融合如何撐起全天候感知: articles/lidar-4dradar-fusion-all-weather-perception-2026.md
     - Waymo 第六代 Driver：砍硬體、補演算法的典範轉移: articles/waymo-6th-gen-sensor-reduction-2026.md
+  - LLM 架構與效能:
     - 1200 萬 Token：SubQ 把 Attention 拉回線性: articles/subq-12m-context-subquadratic-attention.md
+  - AI Agent 與架構:
     - AI 的 A2A 時代：MCP 與 Agent-to-Agent 協定: articles/mcp-a2a-protocol-ai-architecture-2026.md
     - Agentic AI 的新神經：貝葉斯控制層: articles/bayesian-control-layer-agentic-ai.md
-    - AGIBOT WORLD 2026 開源真實機器人數據集: articles/agibot-world-2026-dataset.md
+  - Physical AI 與具身智慧:
+    - 20.2 毫秒的閉環：Sony Ace 桌球機器人與延遲預算: articles/sony-ace-realtime-perception-control-2026.md
+    - 從實驗室走進產線：Physical AI 基礎模型的 2026 落地時刻: articles/physical-ai-foundation-models-robotics-2026.md
+    - 1,250 小時換來的一件事：humanoid 想商用化，瓶頸卡在手腕: articles/figure02-bmw-1250hours-forearm-humanoid-2026.md
+    - Demo 裡能跑，產線上會死：機器人策略的「部署時可靠性」: articles/deployment-time-reliability-runtime-failure-detection-2026.md
+    - 1kHz 的觸覺撞上 10Hz 的大腦：2026 機器人「手感」的延遲之戰: articles/tactile-sensing-1khz-dual-path-latency-2026.md
     - 具身智慧爆發：2026 年的重大突破: articles/embodied-intelligence-breakthrough-2026.md
     - Physical AI 崛起：AI 從聊天機器人走向真實世界: articles/physical-ai-rise-2026.md
     - Physical AI：AI 與機器人融合的下一個十年: articles/physical-ai-next-decade.md
-    - Edge AI 推理優化: articles/edge-ai-inference.md
+  - VLA 與機器人學習:
+    - GR00T N1.6 雙系統架構：NVIDIA 把 Cosmos Reason 2 塞進人形機器人: articles/groot-n16-dual-system-cosmos-reason-2026.md
+    - ACoT-VLA：把「思考」直接塞進動作空間: articles/acot-vla-action-chain-of-thought-2026.md
+    - 資料工廠倒逼演算法：中國 50 萬人的 egocentric pipeline: articles/china-data-pipeline-vla-architecture-2026.md
+    - EgoScale：20K 小時人類影片，把 Scaling Law 搬進機器手: articles/egoscale-robotics-scaling-law-2026.md
+    - 100x 能耗的代價：Neuro-Symbolic 為什麼能輾壓 VLA: articles/neuro-symbolic-vla-energy-100x-2026.md
+    - AGIBOT WORLD 2026 開源真實機器人數據集: articles/agibot-world-2026-dataset.md
+  - 世界模型與 Sim-to-Real:
+    - 讓機器人先想再做：2026 年世界模型成為機器人的「想像層」: articles/world-models-imagination-layer-robotics-2026.md
+    - 當模擬器自己學會做夢：World Models 重寫機器人學習的資料賬本: articles/world-models-robot-learning-learned-simulators-2026.md
+    - Sim-to-Real 的最後一哩路：當多物理模擬遇上世界模型: articles/sim-to-real-gap-cadence-nvidia-2026.md
+  - 邊緣運算與機器人 SoC:
+    - 把雲端的大腦塞進機器人：2026 年 VLA 的邊緣壓縮之戰: articles/vla-edge-compression-realtime-inference-2026.md
+    - 700 TOPS vs 2070 TFLOPS：人形機器人 SoC 的兩種哲學: articles/dragonwing-iq10-vs-jetson-thor-humanoid-soc-2026.md
+    - 當 NPU 跌破 1 美元：AI 下沉到 32 KB 的 MCU 世界: articles/sub-dollar-mcu-npu-tinyml-edge-2026.md
+    - 邊緣 AI 推理優化：從理論到實踐: articles/edge-ai-inference.md
+  - 機器人系統與框架:
+    - ROS 2 終於要 GPU-aware：NITROS、Greenwave Monitor 與 Physical AI SIG: articles/ros2-gpu-aware-nitros-physical-ai-sig-2026.md
+    - ROS2 + LLM：延遲不對稱的接縫——behavior tree 是被低估的中介層: articles/ros2-llm-behavior-tree-latency-asymmetry-2026.md
 
 markdown_extensions:
   - pymdownx.highlight:
@@ -56,5 +74,4 @@ markdown_extensions:
 
 extra_javascript:
   - javascripts/mathjax.js
-  - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
