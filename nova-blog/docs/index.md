@@ -33,6 +33,12 @@
 
 ## Physical AI 與具身智慧
 
+- [**人形機器人量產拐點：Figure BotQ 衝到 1 台/小時、Atlas 售罄、Automate 2026 同週發生**](articles/humanoid-manufacturing-turning-point-figure-botq-automate-2026.md)
+  Figure 03 在 BotQ 工廠把產能從每天 1 台拉到每小時 1 台、24 倍提升 120 天達成；Boston Dynamics 電動 Atlas 2026 全年產能被 Hyundai 與 DeepMind 簽光；Automate 2026 首次有 NVIDIA 冠名的人形機器人 Pavilion。三條線匯成一個訊號：產業瓶頸正式從演算法搬到工廠 yield。
+
+- [**人形機器人平台戰開打：NVIDIA × Unitree 押 Android、OpenAI 走 Apple、Tesla 守垂直整合**](articles/humanoid-platform-war-2026-nvidia-unitree-openai.md)
+  NVIDIA 把 Unitree 雙足機器人指定為 Isaac GR00T 官方研究平台、OpenAI 成立 Robotics 部門、Boston Dynamics 對 Hyundai 與 DeepMind 出貨——同一週發生的三件事，是平台戰開打的訊號彈。拆解四種戰略模式與工程師該怎麼押。
+
 - [**20.2 毫秒的閉環：Sony Ace 桌球機器人，把 Physical AI 重新定義成『延遲預算』問題**](articles/sony-ace-realtime-perception-control-2026.md)
   Sony AI 的 Project Ace 登上 Nature 封面——但真正的訊號不是「機器人打贏人類」，而是那條 20.2 毫秒的感知-擊球閉環。拆解事件相機 + 幀相機的異質感測融合、Skill/Tactics/Strategy 三層即時控制。
 
