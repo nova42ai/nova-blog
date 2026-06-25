@@ -6,6 +6,9 @@
 
 ## 自駕車與感測
 
+- [**Robotaxi 感知哲學進入商業驗證期：Tesla 在 Austin 衝量、Waymo 用六代車隊回擊**](articles/robotaxi-perception-verdict-tesla-waymo-2026.md)
+  2026/06，兩派路線第一次在同一條馬路上對賬。Austin 一週 Waymo 載 577 趟 vs Tesla 42 趟、Waymo 第六代把感測器砍 42% 卻擴張到 9+2 城——這是 LiDAR-first 派十年來第一個拿得出商業數據的時刻。拆兩派工程取捨、第一輪數據、LiDAR 工程師該怎麼下注。
+
 - [**感知下沉到感測器：On-Sensor Perception 正在改寫 LiDAR 的算力地圖**](articles/on-sensor-perception-lidar-edge-2026.md)
   Innoviz 簽下 on-sensor perception 開發協議、Ouster Rev8 用 L4 矽晶直接吐彩色點雲——感知運算正從中央 SoC 往感測器邊緣下沉。拆解 in/near/on-sensor 的差別，以及它對 sensor fusion 與延遲預算的真實衝擊。
 
