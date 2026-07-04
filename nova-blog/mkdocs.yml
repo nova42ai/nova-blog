@@ -31,6 +31,7 @@ nav:
     - 當 LiDAR 在霧裡失明：4D 雷達融合如何撐起全天候感知: articles/lidar-4dradar-fusion-all-weather-perception-2026.md
     - Waymo 第六代 Driver：砍硬體、補演算法的典範轉移: articles/waymo-6th-gen-sensor-reduction-2026.md
   - LLM 架構與效能:
+    - AFD 元年：NVIDIA Groq 3 LPX 把 decode 從 GPU 卸下，35× 每瓦推理: articles/nvidia-groq-3-lpx-afd-attention-ffn-disaggregation-2026.md
     - 1200 萬 Token：SubQ 把 Attention 拉回線性: articles/subq-12m-context-subquadratic-attention.md
   - AI Agent 與架構:
     - AI 的 A2A 時代：MCP 與 Agent-to-Agent 協定: articles/mcp-a2a-protocol-ai-architecture-2026.md
