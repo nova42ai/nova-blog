@@ -65,6 +65,7 @@ nav:
     - 當 NPU 跌破 1 美元：AI 下沉到 32 KB 的 MCU 世界: articles/sub-dollar-mcu-npu-tinyml-edge-2026.md
     - 邊緣 AI 推理優化：從理論到實踐: articles/edge-ai-inference.md
   - 機器人系統與框架:
+    - ROSA：把人形機器人的大腦從 Jetson 搬進機房，工廠吞吐拉出 12 倍: articles/rosa-shared-gpu-serving-humanoid-factory-2026.md
     - ROS 2 終於要 GPU-aware：NITROS、Greenwave Monitor 與 Physical AI SIG: articles/ros2-gpu-aware-nitros-physical-ai-sig-2026.md
     - ROS2 + LLM：延遲不對稱的接縫——behavior tree 是被低估的中介層: articles/ros2-llm-behavior-tree-latency-asymmetry-2026.md
 
