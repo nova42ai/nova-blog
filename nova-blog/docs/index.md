@@ -68,6 +68,9 @@
 
 ## VLA 與機器人學習
 
+- [**GR00T N1.7 Apache 2.0：換掉 Eagle 骨幹、40K 小時真:模 4:1，DROID-F6 +61% 從哪來？**](articles/groot-n17-cosmos-reason2-apache-lerobot-2026.md)
+  NVIDIA 與 Hugging Face 同步釋出 Isaac GR00T N1.7，掛 Apache 2.0——第一個真正商用可用、且完整開源的 humanoid VLA foundation model。Backbone 換 Cosmos-Reason2-2B、ONNX/TensorRT 直上 Jetson Thor、LeRobot 整合把 1300 萬 Hugging Face 開發者接進機器人生態。真正的技術聲明不是那個 Apache 標籤，是 DROID-F6 那 61% 的來源。
+
 - [**GR00T N1.6 雙系統架構：NVIDIA 把 Cosmos Reason 2 塞進人形機器人的『大腦皮層』**](articles/groot-n16-dual-system-cosmos-reason-2026.md)
   NVIDIA 用 dual-system 把 LLM 推理與低層控制解耦——慢思考用 Cosmos Reason 2，快控制走專用 policy。拆解這套架構為什麼是 humanoid 軟體棧的轉折點。
 
