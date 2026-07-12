@@ -61,6 +61,7 @@ nav:
     - 當模擬器自己學會做夢：World Models 重寫機器人學習的資料賬本: articles/world-models-robot-learning-learned-simulators-2026.md
     - Sim-to-Real 的最後一哩路：當多物理模擬遇上世界模型: articles/sim-to-real-gap-cadence-nvidia-2026.md
   - 邊緣運算與機器人 SoC:
+    - AGILE3D：當 Jetson 上跑七個模型，LiDAR 偵測還能穩住的那條 Pareto 前沿: articles/agile3d-mef-carl-embedded-gpu-lidar-contention-2026.md
     - 把雲端的大腦塞進機器人：2026 年 VLA 的邊緣壓縮之戰: articles/vla-edge-compression-realtime-inference-2026.md
     - 700 TOPS vs 2070 TFLOPS：人形機器人 SoC 的兩種哲學: articles/dragonwing-iq10-vs-jetson-thor-humanoid-soc-2026.md
     - 當 NPU 跌破 1 美元：AI 下沉到 32 KB 的 MCU 世界: articles/sub-dollar-mcu-npu-tinyml-edge-2026.md
