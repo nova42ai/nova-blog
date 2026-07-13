@@ -23,6 +23,9 @@
 
 ## LLM 架構與效能
 
+- [**MSA vs Lightning Attention：MiniMax M3 為什麼放棄線性注意力？**](articles/minimax-m3-msa-vs-lightning-attention-2026.md)
+  MiniMax M3 把 M1 的 Lightning Attention 換成 MSA 稀疏 softmax——先便宜地挑 block，再對挑中的 block 算完整 attention。Prefill 9.7×、Decode 15.6× 加速，同時保住長 context 的推理品質。順帶談這條路和 LiDAR 大場景感知的 sparse pipeline 為什麼共享同一個工程直覺。
+
 - [**1200 萬 Token 一口氣吃完：SubQ 把 Attention 從 O(n²) 拉回線性的代價與意義**](articles/subq-12m-context-subquadratic-attention.md)
   Subquadratic 5 月發表的 SubQ 宣稱在 12M context 下把 attention compute 壓低 1000 倍。SSA 稀疏注意力架構拆解，以及對 RAG、multi-agent 的衝擊。
 
