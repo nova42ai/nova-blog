@@ -25,6 +25,8 @@ theme:
 nav:
   - Home: index.md
   - 自駕車與感測:
+    - MIT 用三顆不同形狀的天線破解 OPA 十年老問題：Chip-scale LiDAR 把 crosstalk 從 100% 打到 1%: articles/mit-opa-3antenna-chip-lidar-kyber-2026.md
+    - L2RDaS：當 4D Radar 卡在資料集規模，KAIST 決定用 LiDAR 合成 Radar: articles/l2rdas-lidar-to-4d-radar-synthesis-cvpr-2026.md
     - Robotaxi 第一輪商業對賬：Tesla 在 Austin 衝量、Waymo 第六代擴張的數據解讀: articles/robotaxi-perception-verdict-tesla-waymo-2026.md
     - 感知下沉到感測器：On-Sensor Perception 改寫 LiDAR 算力地圖: articles/on-sensor-perception-lidar-edge-2026.md
     - 當每個點雲都自帶速度：FMCW LiDAR 上 Hyperion 之後: articles/fmcw-lidar-hyperion-velocity-perception-2026.md
