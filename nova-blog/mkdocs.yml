@@ -54,6 +54,7 @@ nav:
     - Physical AI 崛起：AI 從聊天機器人走向真實世界: articles/physical-ai-rise-2026.md
     - Physical AI：AI 與機器人融合的下一個十年: articles/physical-ai-next-decade.md
   - VLA 與機器人學習:
+    - 『能讀出來』≠『能操縱』：為什麼一個線性 probe 就能監控 VLA 進度，而 mechanistic interpretability 正在進入機器人部署層: articles/vla-task-progress-linear-probe-mechanistic-interpretability-2026.md
     - GR00T N1.7 Apache 2.0：換掉 Eagle 骨幹，DROID-F6 +61% 從哪來？: articles/groot-n17-cosmos-reason2-apache-lerobot-2026.md
     - GR00T N1.6 雙系統架構：NVIDIA 把 Cosmos Reason 2 塞進人形機器人: articles/groot-n16-dual-system-cosmos-reason-2026.md
     - ACoT-VLA：把「思考」直接塞進動作空間: articles/acot-vla-action-chain-of-thought-2026.md
