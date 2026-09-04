@@ -24,6 +24,17 @@ theme:
 
 nav:
   - Home: index.md
+  - 編譯器與 GPU 棧:
+    - ARGUS：用資料流不變量把 LLM 寫的 GPU kernel 拉到 99-104% 手工 assembly: articles/argus-data-flow-invariants-llm-gpu-kernel-verified-2026.md
+    - CUDA 護城河的雙面夾擊：Mojo 開源 × LLM Kernel Agent 同時越線: articles/cuda-moat-two-front-mojo-open-source-llm-kernel-agents-2026.md
+    - CuTeDSL 進 Inductor：PyTorch 把 GEMM fast-path 外包給 Nvidia: articles/cutedsl-inductor-backend-pytorch-blackwell-cuda-moat-2026.md
+    - Event Tensor：CMU Catalyst 把整條 LLM serving 迴圈壓進 persistent megakernel: articles/event-tensor-etc-dynamic-megakernel-llm-serving-cmu-mlsys2026.md
+    - Flashlight：把 attention 變種的 fusion 交還給 compiler，TorchInductor 進圖重寫時代: articles/flashlight-torchinductor-attention-compiler-graph-rewrites-mlsys2026.md
+    - Kernel-as-Package：Hugging Face kernels 把 GPU kernel 變成 pip install: articles/hf-kernels-package-registry-cuda-distribution-layer-2026.md
+    - KernelBenchX：176 個任務給「LLM 寫 GPU kernel」一張成績單: articles/kernelbenchx-176-tasks-llm-gpu-kernel-agent-reality-check-2026.md
+    - Qualcomm 的第二戰場：Hexagon-MLIR 正在挖 CUDA 的下層護城河: articles/qualcomm-hexagon-mlir-second-front-cuda-lower-moat-2026.md
+    - "!tosa.block_scaled 落地：MLIR 把 MXFP4/6/8 變成一等公民型別": articles/tosa-block-scaled-mlir-mxfp-type-system-2026.md
+    - Vera Rubin 進入量產：推論成本砍 10× 重設 agentic AI 單位經濟學: articles/vera-rubin-mass-production-inference-economics-2026.md
   - 自駕車與感測:
     - AEye Apollo 進 DRIVE Hyperion：1km × 1550nm × 軟體定義掃描——LiDAR 生態系的第三種站位: articles/aeye-apollo-drive-thor-hyperion-1km-software-defined-lidar-2026.md
     - MIT 用三顆不同形狀的天線破解 OPA 十年老問題：Chip-scale LiDAR 把 crosstalk 從 100% 打到 1%: articles/mit-opa-3antenna-chip-lidar-kyber-2026.md
@@ -33,11 +44,25 @@ nav:
     - 當每個點雲都自帶速度：FMCW LiDAR 上 Hyperion 之後: articles/fmcw-lidar-hyperion-velocity-perception-2026.md
     - 當 LiDAR 在霧裡失明：4D 雷達融合如何撐起全天候感知: articles/lidar-4dradar-fusion-all-weather-perception-2026.md
     - Waymo 第六代 Driver：砍硬體、補演算法的典範轉移: articles/waymo-6th-gen-sensor-reduction-2026.md
+    - D4RT 拿下 CVPR 2026 Best Paper：單一查詢介面把 4D 場景重建打穿到 300×: articles/d4rt-cvpr-2026-best-paper-4d-scene-query-2026.md
+    - 從 Hesai ETX 到 Waymo 5nm ASIC：LiDAR 競爭核心是 silicon-algorithm co-design: articles/hesai-etx-waymo-asic-lidar-silicon-algo-codesign-2026.md
+    - Jetson Thor 出貨兩週後：128GB、FP4、MIG 對感知工程師意味什麼: articles/jetson-thor-lidar-perception-fp4-mig-2026.md
+    - LiDAR 工業化拐點 2026：InnovizThree、Hesai、Volvo 三方力學: articles/lidar-industrialization-2026-innoviz-hesai-volvo.md
+    - LiDAR 三道新臨界點：$10K EV、全固態、去 Nvidia 化: articles/lidar-three-new-thresholds-2026-byd-seyond-rivian.md
+    - 從 100% 到 1%：MIT 用不一樣的天線解掉矽光子 LiDAR 老問題: articles/mit-silicon-photonic-lidar-opa-crosstalk-2026.md
+    - NHTSA 給 AV 廠 17 天：emergency scene 被寫成 functional insufficiency: articles/nhtsa-emergency-scene-functional-insufficiency-av-2026.md
+    - 從 4D 到 5D：Toronto × Ciena 拿電信 coherent modem 塞進單點 LiDAR 量測: articles/polarization-coherent-lidar-toronto-ciena-5d-2026.md
+    - Teradar 的 THz Vision：LiDAR 產業第一次遇上頻段外的真對手: articles/teradar-terahertz-vision-lidar-challenge-2026.md
+    - Tesla FSD v14 Lite 給 HW3：12.5GB 自駕大腦壓進 8GB LPDDR4: articles/tesla-fsd-v14-lite-hw3-distillation-edge-ai-2026.md
+    - 自駕車進 post-training 時代：OpenDriveLab World Engine 的資料分布典範轉移: articles/world-engine-opendrivelab-post-training-autonomous-driving-2026.md
+    - XPENG VLA 2.0：把語言層拿掉，自動駕駛 VLA 走進隱式 token 時代: articles/xpeng-vla-2-implicit-token-action-2026.md
   - LLM 架構與效能:
     - 3T 參數時代的分水嶺：Kimi K3 的 Quantile Balancing 與 MoE 稀疏活化: articles/kimi-k3-quantile-balancing-moe-sparse-activation-2026.md
     - MSA vs Lightning Attention：MiniMax M3 為什麼放棄線性注意力: articles/minimax-m3-msa-vs-lightning-attention-2026.md
     - AFD 元年：NVIDIA Groq 3 LPX 把 decode 從 GPU 卸下，35× 每瓦推理: articles/nvidia-groq-3-lpx-afd-attention-ffn-disaggregation-2026.md
     - 1200 萬 Token：SubQ 把 Attention 拉回線性: articles/subq-12m-context-subquadratic-attention.md
+    - J-lens 與 LLM 裡的「全球工作空間」：Anthropic 給 interpretability 找到理論骨架: articles/anthropic-jlens-global-workspace-llm-2026.md
+    - WA-SpecDec：Speculative Decoding 移植 VLA 為什麼會出事、以及正確做法: articles/wa-specdec-world-aware-speculative-decoding-vla-safety-2026.md
   - AI Agent 與架構:
     - AI 的 A2A 時代：MCP 與 Agent-to-Agent 協定: articles/mcp-a2a-protocol-ai-architecture-2026.md
     - Agentic AI 的新神經：貝葉斯控制層: articles/bayesian-control-layer-agentic-ai.md
@@ -53,6 +78,13 @@ nav:
     - 具身智慧爆發：2026 年的重大突破: articles/embodied-intelligence-breakthrough-2026.md
     - Physical AI 崛起：AI 從聊天機器人走向真實世界: articles/physical-ai-rise-2026.md
     - Physical AI：AI 與機器人融合的下一個十年: articles/physical-ai-next-decade.md
+    - 百萬機器人之後：Amazon DeepFleet 用 foundation model 改寫 fleet coordination: articles/amazon-deepfleet-multirobot-foundation-model-2026.md
+    - 14 MB 塞下一個能呼叫工具的模型：Cactus Needle 2 與從預訓練就 2-bit 的邊緣 agent: articles/cactus-needle2-14mb-2bit-agentic-mcu-edge-2026.md
+    - 10 萬行 C++ 換成 10M 參數神經網路:Figure Helix S0 把 humanoid 底層控制器學走: articles/figure-helix-s0-109k-cpp-replaced-1khz-neural-controller-2026.md
+    - AI 造 AI 硬體：Foxconn Houston 廠的 GR00T 部署為什麼是物理 AI 分水嶺: articles/foxconn-houston-groot-physical-ai-flywheel-2026.md
+    - 廚房洗碗機不需要重訓：用樂高式基礎模型堆疊做 89% ADI: articles/kitchen-manipulation-foundation-models-modular-perception-2026.md
+    - Embodiment Gap：TMLR 21 個方法群沒有一個歸類到 safety/recovery: articles/embodiment-gap-robot-foundation-models-safety-recovery-blind-spot-2026.md
+    - 從 ISO 26262 到 ISO 13849：NVIDIA Halos for Robotics 把功能安全整包搬進物理 AI: articles/nvidia-halos-robotics-functional-safety-2026.md
   - VLA 與機器人學習:
     - 『能讀出來』≠『能操縱』：為什麼一個線性 probe 就能監控 VLA 進度，而 mechanistic interpretability 正在進入機器人部署層: articles/vla-task-progress-linear-probe-mechanistic-interpretability-2026.md
     - GR00T N1.7 Apache 2.0：換掉 Eagle 骨幹，DROID-F6 +61% 從哪來？: articles/groot-n17-cosmos-reason2-apache-lerobot-2026.md
@@ -62,10 +94,25 @@ nav:
     - EgoScale：20K 小時人類影片，把 Scaling Law 搬進機器手: articles/egoscale-robotics-scaling-law-2026.md
     - 100x 能耗的代價：Neuro-Symbolic 為什麼能輾壓 VLA: articles/neuro-symbolic-vla-energy-100x-2026.md
     - AGIBOT WORLD 2026 開源真實機器人數據集: articles/agibot-world-2026-dataset.md
+    - Cosmos Policy：把動作當潛在影格塞進 Video Diffusion，LIBERO 98.5% 怎麼來的: articles/cosmos-policy-latent-frame-injection-video-action-2026.md
+    - RACER：兩個 forecaster 吵架就是免費的 uncertainty 訊號，training-free 加速新起點: articles/racer-disagree-to-accelerate-closed-loop-diffusion-2026.md
+    - GEM：Tencent 讓 VLA 長出深度視覺，把 3D 結構灌進 Qwen3-VL: articles/gem-tencent-depth-supervision-vla-spatial-2026.md
+    - Gemini Robotics 2：從模組化拼接到腳到指尖單一策略的 VLA: articles/gemini-robotics-2-whole-body-vla-unified-policy-2026.md
+    - In-Context VLA：讓機器人讀證據而不是講理由，把 CoT 這條路徑釘死: articles/in-context-vla-consume-not-generate-language-2026.md
+    - LingBot-VLA 2.0：中國開源 VLA 首次系統性壓過 π0.5——6B、20 種本體、130ms: articles/lingbot-vla-2-open-source-6b-cross-embodiment-2026.md
+    - τ₀-VLA：test-time compute 跨進機器人，用世界模型當 subtask verifier: articles/tau-zero-vla-test-time-compute-robotics-hierarchical-world-model-2026.md
+    - VLA 精度為什麼不夠：TACO 的 tactile 世界模型 vs Robo-ValueRL: articles/vla-post-training-two-paths-taco-robovaluerl-2026.md
+    - VLA、WAM 都還不夠：Position paper 點名機器人 foundation model 缺的四個 interface: articles/post-vla-wam-four-interfaces-position-paper-2026.md
+    - VLA 的 8.80% 恐慌：港大 RoboDojo 為什麼是 2026 下半年最刺耳的成績單: articles/robodojo-hku-vla-benchmark-8-percent-crisis-2026.md
+    - 從 23% 到 93%：Spot 裝上 Gemini Robotics-ER 1.6，VLA 走進工業巡檢: articles/spot-gemini-robotics-er16-vla-inspection-2026.md
+    - Xiaomi-Robotics-1：10 萬小時 UMI 證明資料 > 模型，VLA 的 Chinchilla 時刻: articles/xiaomi-robotics-1-100k-hours-umi-data-scaling-2026.md
   - 世界模型與 Sim-to-Real:
     - 讓機器人先想再做：2026 年世界模型成為機器人的「想像層」: articles/world-models-imagination-layer-robotics-2026.md
     - 當模擬器自己學會做夢：World Models 重寫機器人學習的資料賬本: articles/world-models-robot-learning-learned-simulators-2026.md
     - Sim-to-Real 的最後一哩路：當多物理模擬遇上世界模型: articles/sim-to-real-gap-cadence-nvidia-2026.md
+    - Kairos：把 Video 世界模型重寫成控制原生的世界—動作模型: articles/kairos-regret-aware-world-action-model-hybrid-linear-attention-2026.md
+    - World Model 終於上產線：Decart Oasis 3 用 $0.02/sec API 把會做夢的模擬器推進量產: articles/decart-oasis3-realtime-world-model-production-2026.md
+    - 後 VLA 時代來了？NVIDIA DreamZero 用先做夢再動作的 World Action Model: articles/dreamzero-world-action-model-post-vla-2026.md
   - 邊緣運算與機器人 SoC:
     - AGILE3D：當 Jetson 上跑七個模型，LiDAR 偵測還能穩住的那條 Pareto 前沿: articles/agile3d-mef-carl-embedded-gpu-lidar-contention-2026.md
     - 把雲端的大腦塞進機器人：2026 年 VLA 的邊緣壓縮之戰: articles/vla-edge-compression-realtime-inference-2026.md
