@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - Syncopate：OSDI 2026 把 communication chunk 提升成 compiler 一級抽象，多 GPU 拿到 4.7× 加速: articles/syncopate-chunk-abstraction-triton-source-to-source-compiler-multi-gpu-communication-osdi2026.md
     - ARGUS：用資料流不變量把 LLM 寫的 GPU kernel 拉到 99-104% 手工 assembly: articles/argus-data-flow-invariants-llm-gpu-kernel-verified-2026.md
     - CUDA 護城河的雙面夾擊：Mojo 開源 × LLM Kernel Agent 同時越線: articles/cuda-moat-two-front-mojo-open-source-llm-kernel-agents-2026.md
     - CuTeDSL 進 Inductor：PyTorch 把 GEMM fast-path 外包給 Nvidia: articles/cutedsl-inductor-backend-pytorch-blackwell-cuda-moat-2026.md
