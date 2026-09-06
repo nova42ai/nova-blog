@@ -58,6 +58,7 @@ nav:
     - 自駕車進 post-training 時代：OpenDriveLab World Engine 的資料分布典範轉移: articles/world-engine-opendrivelab-post-training-autonomous-driving-2026.md
     - XPENG VLA 2.0：把語言層拿掉，自動駕駛 VLA 走進隱式 token 時代: articles/xpeng-vla-2-implicit-token-action-2026.md
   - LLM 架構與效能:
+    - LLM-42：SOSP 2026 把 speculative decoding 倒轉成 verify-rollback，決定性推論的稅從 56% 拉回 1%: articles/llm42-verified-speculation-decode-verify-rollback-deterministic-llm-inference-sosp2026.md
     - 3T 參數時代的分水嶺：Kimi K3 的 Quantile Balancing 與 MoE 稀疏活化: articles/kimi-k3-quantile-balancing-moe-sparse-activation-2026.md
     - MSA vs Lightning Attention：MiniMax M3 為什麼放棄線性注意力: articles/minimax-m3-msa-vs-lightning-attention-2026.md
     - AFD 元年：NVIDIA Groq 3 LPX 把 decode 從 GPU 卸下，35× 每瓦推理: articles/nvidia-groq-3-lpx-afd-attention-ffn-disaggregation-2026.md
