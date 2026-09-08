@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "TIER IV 開源 L4 自駕晶片：TOSA 當框架/硬體邊界、formal verify 收 safety、Autoware 補全整條開源棧——AV silicon 第一次出現能挑戰 Thor/EyeQ 的開源路徑": articles/tier-iv-open-source-l4-av-chip-tosa-compiler-autoware-2026.md
     - Syncopate：OSDI 2026 把 communication chunk 提升成 compiler 一級抽象，多 GPU 拿到 4.7× 加速: articles/syncopate-chunk-abstraction-triton-source-to-source-compiler-multi-gpu-communication-osdi2026.md
     - ARGUS：用資料流不變量把 LLM 寫的 GPU kernel 拉到 99-104% 手工 assembly: articles/argus-data-flow-invariants-llm-gpu-kernel-verified-2026.md
     - CUDA 護城河的雙面夾擊：Mojo 開源 × LLM Kernel Agent 同時越線: articles/cuda-moat-two-front-mojo-open-source-llm-kernel-agents-2026.md
