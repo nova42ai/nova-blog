@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "Wavel + MeshRT：SOSP 2026 用 compile-time governed runtime 把 wafer-scale accelerator 從『手寫地獄』拉進『可編譯世界』，Edinburgh × MSR 開出 GPU 之外的第三條 compiler 賽道": articles/wavel-meshrt-wafer-scale-compiler-runtime-sosp2026.md
     - "MorphKernel：SOSP 2026 用 cross-SM cooperation + just-in-time reduction 馴服 GPU 上的 dynamism，MoE decoding / attention 拿 1.3× 平均加速": articles/morphkernel-cross-sm-fusion-just-in-time-reduction-dynamic-gpu-operators-sosp2026.md
     - "TIER IV 開源 L4 自駕晶片：TOSA 當框架/硬體邊界、formal verify 收 safety、Autoware 補全整條開源棧——AV silicon 第一次出現能挑戰 Thor/EyeQ 的開源路徑": articles/tier-iv-open-source-l4-av-chip-tosa-compiler-autoware-2026.md
     - Syncopate：OSDI 2026 把 communication chunk 提升成 compiler 一級抽象，多 GPU 拿到 4.7× 加速: articles/syncopate-chunk-abstraction-triton-source-to-source-compiler-multi-gpu-communication-osdi2026.md
