@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "Model2Kernel：SOSP 2026 用 model-aware symbolic execution 從 vLLM / Hugging Face 挖出 353 個 CUDA memory bug，把「LLM 推論可靠性」的第三塊拼圖補上": articles/model2kernel-353-cuda-bugs-vllm-huggingface-symbolic-execution-sosp2026.md
     - "MaxKernel + KernelArc：一個月內兩篇 agentic kernel 論文 —— TPU v6e 上 AI-generated 打贏人類手調 2.32× vs 2.02×，B200 上 paged prefill 143× baseline，coordination protocol 才是勝負手": articles/maxkernel-kernelarc-agentic-kernel-autotuning-tpu-blackwell-multi-agent-2026.md
     - "Triton 3.8 + autoWS：開源 compiler 追上 Blackwell 的六個 pass——對 cuDNN 還差 10-20% 的意義": articles/triton-3-8-autows-warp-specialization-blackwell-open-compiler-2026.md
     - "Wavel + MeshRT：SOSP 2026 用 compile-time governed runtime 把 wafer-scale accelerator 從『手寫地獄』拉進『可編譯世界』，Edinburgh × MSR 開出 GPU 之外的第三條 compiler 賽道": articles/wavel-meshrt-wafer-scale-compiler-runtime-sosp2026.md
