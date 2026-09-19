@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "Physical AI 把 GPU 拖回作業系統核心：SOSP 2026 Linux AGX、Kairos、gpu_ext 三重奏——當 Jetson Thor 已經給了 MIG／Green Contexts，policy 由誰來寫？": articles/linux-agx-kairos-gpu-ext-physical-ai-os-gpu-codesign-sosp2026.md
     - "MLIR 拯救不了 HLS？Dynamatic 團隊 LATTE'26 的三年血淚報告——當 dataflow compiler 撞上『萬物皆 op』的本體論偏見": articles/dynamatic-mlir-hls-experience-latte2026.md
     - "cuTile 是為了打 Triton 而生的嗎？獨立評測揭露 NVIDIA 新 Tile DSL 的效能曲線與生態算計": articles/cutile-triton-blackwell-portability-cuda131-2026.md
     - "TensorLift：ICCAD 2026 用 8-pass MLIR pipeline 從 RTL 反向抽出 tensor ISA、自動生出加速器 compiler backend，讓 hardware/software co-design 的最後一里路第一次能被自動化": articles/tensorlift-mlir-8pass-rtl-tensor-isa-accelerator-compiler-backend-iccad2026.md
