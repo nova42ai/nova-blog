@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "tiny-gpu-compiler：15 條 TableGen ops，把 GPU kernel 一路編到 Verilog 矽晶片上": articles/tiny-gpu-compiler-mlir-verilog-gpu-16bit-isa-education-2026.md
     - "當 Triton 慢 30× 還靜默丟資料：CUDA C++、cuda-oxide Rust、Triton 在 hash-blocked TSDF 融合的三語言實測": articles/what-irregularity-costs-cuda-rust-triton-tsdf-fusion-2026.md
     - "ParallelKittens vs Syncopate：MLSys 2026 拆開的「多 GPU AI kernel 該不該由 compiler 生」——Stanford 選 CUDA 框架 + 8 primitives，OSDI 派選 source-to-source Triton pass": articles/parallelkittens-vs-syncopate-cuda-framework-mlsys2026-multi-gpu-kernels.md
     - "Physical AI 把 GPU 拖回作業系統核心：SOSP 2026 Linux AGX、Kairos、gpu_ext 三重奏——當 Jetson Thor 已經給了 MIG／Green Contexts，policy 由誰來寫？": articles/linux-agx-kairos-gpu-ext-physical-ai-os-gpu-codesign-sosp2026.md
