@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "Intel 這個月在 MLIR 上做的兩件事：XeVM 進 upstream LLVM + Linalg 依賴 reduction fusion（Battlemage attention 吃到 2.7× 加速）": articles/intel-xevm-upstream-linalg-dependent-reduction-fusion-battlemage-2026.md
     - "NVIDIA 開源 CUDA Tile IR：三層 dialect、46+ passes，把 Python 一路推到 SASS": articles/nvidia-cuda-tile-ir-opensource-46-pass-mlir-dialect-blackwell-2026.md
     - "tiny-gpu-compiler：15 條 TableGen ops，把 GPU kernel 一路編到 Verilog 矽晶片上": articles/tiny-gpu-compiler-mlir-verilog-gpu-16bit-isa-education-2026.md
     - "當 Triton 慢 30× 還靜默丟資料：CUDA C++、cuda-oxide Rust、Triton 在 hash-blocked TSDF 融合的三語言實測": articles/what-irregularity-costs-cuda-rust-triton-tsdf-fusion-2026.md
