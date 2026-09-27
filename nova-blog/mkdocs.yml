@@ -126,6 +126,7 @@ nav:
     - 從 23% 到 93%：Spot 裝上 Gemini Robotics-ER 1.6，VLA 走進工業巡檢: articles/spot-gemini-robotics-er16-vla-inspection-2026.md
     - Xiaomi-Robotics-1：10 萬小時 UMI 證明資料 > 模型，VLA 的 Chinchilla 時刻: articles/xiaomi-robotics-1-100k-hours-umi-data-scaling-2026.md
   - 世界模型與 Sim-to-Real:
+    - "JEPA-WAM：把「文字 → T2I 目標圖 → V-JEPA 2.1 編碼」當 WAM 中介層，OOD 場景 27.3 pp 超車 π0——證明 goal image 才是 world model 的正確 conditioning interface": articles/jepa-wam-visual-instruction-bank-v-jepa-2-1-text-to-image-goal-2026.md
     - 讓機器人先想再做：2026 年世界模型成為機器人的「想像層」: articles/world-models-imagination-layer-robotics-2026.md
     - 當模擬器自己學會做夢：World Models 重寫機器人學習的資料賬本: articles/world-models-robot-learning-learned-simulators-2026.md
     - Sim-to-Real 的最後一哩路：當多物理模擬遇上世界模型: articles/sim-to-real-gap-cadence-nvidia-2026.md
