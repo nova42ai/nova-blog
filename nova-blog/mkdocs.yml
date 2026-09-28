@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "Mojo 1.1：第一個「歡迎外部 PR」的版本，KGEN、inferred member refs、以及 B200 上 16× 的 NVFP4": articles/mojo-1-1-open-compiler-contributions-kgen-gpu-kernels-inferred-member-2026.md
     - "Intel 這個月在 MLIR 上做的兩件事：XeVM 進 upstream LLVM + Linalg 依賴 reduction fusion（Battlemage attention 吃到 2.7× 加速）": articles/intel-xevm-upstream-linalg-dependent-reduction-fusion-battlemage-2026.md
     - "NVIDIA 開源 CUDA Tile IR：三層 dialect、46+ passes，把 Python 一路推到 SASS": articles/nvidia-cuda-tile-ir-opensource-46-pass-mlir-dialect-blackwell-2026.md
     - "tiny-gpu-compiler：15 條 TableGen ops，把 GPU kernel 一路編到 Verilog 矽晶片上": articles/tiny-gpu-compiler-mlir-verilog-gpu-16bit-isa-education-2026.md
