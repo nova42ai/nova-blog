@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "SOL-ExecBench：Nvidia 用「距離硬體光速多遠」重寫 GPU kernel benchmark，KernelBench 一年就退場——KernelArc 8/20 稱王 Blackwell leaderboard，Meta KernelAgent 拿到 H100 89% roofline": articles/sol-execbench-kernelarc-kernelagent-blackwell-gpu-kernel-agent-benchmark-crystallization-2026.md
     - "Hexagon-MLIR SDK 6.6 + HexKL beta2：Qualcomm 的第二條開源 compiler 產線，怎麼把 Triton kernel 塞進手機 NPU": articles/hexagon-mlir-sdk-660-hexkl-beta2-triton-npu-compiler-career-2026.md
     - "Mojo 1.1：第一個「歡迎外部 PR」的版本，KGEN、inferred member refs、以及 B200 上 16× 的 NVFP4": articles/mojo-1-1-open-compiler-contributions-kgen-gpu-kernels-inferred-member-2026.md
     - "Intel 這個月在 MLIR 上做的兩件事：XeVM 進 upstream LLVM + Linalg 依賴 reduction fusion（Battlemage attention 吃到 2.7× 加速）": articles/intel-xevm-upstream-linalg-dependent-reduction-fusion-battlemage-2026.md
