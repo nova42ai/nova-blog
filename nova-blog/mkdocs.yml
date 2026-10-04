@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "ACT：給一份 ISA description，自動產一整個 XLA backend，AWS Trainium 覆蓋率打 neuronx-cc 2.3×": articles/act-taidl-isa-to-compiler-backend-xla-oopsla-2026.md
     - "AI as a Compiler：GPT-6 Astra 繞過 Triton 直接寫 PTX，BitDelta 跑到 3.34×、但 Volta 一開全線崩盤": articles/ai-as-compiler-taic-triton-ptx-bitdelta-volta-verifier-2026.md
     - "ClangIR 的成熟時刻：Enable-by-default RFC + PolyBench/GPU 84/84 + CUDA/HIP upstream —— MLIR 怎麼悄悄爬進 Clang 的 GPU 編譯路徑": articles/clangir-maturity-rfc-polybench-gpu-cuda-hip-mlir-takeover-2026.md
     - "SOL-ExecBench：Nvidia 用「距離硬體光速多遠」重寫 GPU kernel benchmark，KernelBench 一年就退場——KernelArc 8/20 稱王 Blackwell leaderboard，Meta KernelAgent 拿到 H100 89% roofline": articles/sol-execbench-kernelarc-kernelagent-blackwell-gpu-kernel-agent-benchmark-crystallization-2026.md
