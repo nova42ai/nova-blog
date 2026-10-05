@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "MPK (Mirage Persistent Kernel)：把整個 LLM 推論塞進『一個』GPU kernel ── OSDI 2026 的 compiler/runtime 典範轉移": articles/mpk-mirage-megakernel-sm-level-task-graph-single-kernel-llm-inference-osdi2026.md
     - "ACT：給一份 ISA description，自動產一整個 XLA backend，AWS Trainium 覆蓋率打 neuronx-cc 2.3×": articles/act-taidl-isa-to-compiler-backend-xla-oopsla-2026.md
     - "AI as a Compiler：GPT-6 Astra 繞過 Triton 直接寫 PTX，BitDelta 跑到 3.34×、但 Volta 一開全線崩盤": articles/ai-as-compiler-taic-triton-ptx-bitdelta-volta-verifier-2026.md
     - "ClangIR 的成熟時刻：Enable-by-default RFC + PolyBench/GPU 84/84 + CUDA/HIP upstream —— MLIR 怎麼悄悄爬進 Clang 的 GPU 編譯路徑": articles/clangir-maturity-rfc-polybench-gpu-cuda-hip-mlir-takeover-2026.md
