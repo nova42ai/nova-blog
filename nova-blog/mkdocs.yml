@@ -113,6 +113,7 @@ nav:
     - Embodiment Gap：TMLR 21 個方法群沒有一個歸類到 safety/recovery: articles/embodiment-gap-robot-foundation-models-safety-recovery-blind-spot-2026.md
     - 從 ISO 26262 到 ISO 13849：NVIDIA Halos for Robotics 把功能安全整包搬進物理 AI: articles/nvidia-halos-robotics-functional-safety-2026.md
   - VLA 與機器人學習:
+    - "HarnessPAI：ByteDance Seed 把 code 當成 Physical AI 的 IR，LIBERO-PRO 從 34.9% 衝到 96.5%": articles/harnesspai-code-as-ir-pi05-worlddreamer-libero-pro-bytedance-seed-2026.md
     - 『能讀出來』≠『能操縱』：為什麼一個線性 probe 就能監控 VLA 進度，而 mechanistic interpretability 正在進入機器人部署層: articles/vla-task-progress-linear-probe-mechanistic-interpretability-2026.md
     - GR00T N1.7 Apache 2.0：換掉 Eagle 骨幹，DROID-F6 +61% 從哪來？: articles/groot-n17-cosmos-reason2-apache-lerobot-2026.md
     - GR00T N1.6 雙系統架構：NVIDIA 把 Cosmos Reason 2 塞進人形機器人: articles/groot-n16-dual-system-cosmos-reason-2026.md
