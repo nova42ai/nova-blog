@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "GraCE — 當 CUDA Graph 的三個隱疾被編譯器一次處理掉：OSDI'26 PyTorch2 延伸的一次完整示範": articles/grace-cuda-graphs-pytorch2-compiler-parameter-indirection-selective-osdi2026.md
     - "FlyDSL：AMD 把 CuTe 搬進 ROCm，用 MLIR Python DSL 直插 TorchInductor": articles/flydsl-rocm-cute-layout-algebra-torchinductor-amd-compiler-strategy-2026.md
     - "TLX：Meta 把 Triton 推到 MIMW 的硬體原生入口 ── warp-group 粒度編譯、Blackwell 多 CTA、生產線實戰": articles/tlx-triton-mimw-warp-group-blackwell-meta-production-compiler-2026.md
     - "MPK (Mirage Persistent Kernel)：把整個 LLM 推論塞進『一個』GPU kernel ── OSDI 2026 的 compiler/runtime 典範轉移": articles/mpk-mirage-megakernel-sm-level-task-graph-single-kernel-llm-inference-osdi2026.md
