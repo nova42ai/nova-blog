@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "EdgeAgent：Apple M4 上跑多 Agent LLM，為什麼要繞過 graph compiler？——UMA 零拷貝張量平行、ARM SME 微核心、Tool Stall 掛起機制": articles/edgeagent-uma-tensor-parallel-graph-compiler-bypass-arm-sme-tool-stall-m4-2026.md
     - "GraCE — 當 CUDA Graph 的三個隱疾被編譯器一次處理掉：OSDI'26 PyTorch2 延伸的一次完整示範": articles/grace-cuda-graphs-pytorch2-compiler-parameter-indirection-selective-osdi2026.md
     - "FlyDSL：AMD 把 CuTe 搬進 ROCm，用 MLIR Python DSL 直插 TorchInductor": articles/flydsl-rocm-cute-layout-algebra-torchinductor-amd-compiler-strategy-2026.md
     - "TLX：Meta 把 Triton 推到 MIMW 的硬體原生入口 ── warp-group 粒度編譯、Blackwell 多 CTA、生產線實戰": articles/tlx-triton-mimw-warp-group-blackwell-meta-production-compiler-2026.md
