@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "MLIR 78、Triton Dev Conf 與 TensorRT 11：AI compiler stack 的技術債償還季（2026-10-15）": articles/mlir78-strict-property-rocdl-targetinfo-tensorrt11-strongly-typed-compiler-debt-payback-2026.md
     - "Xtrace：把 probe 塞進 compiler 已經排好的 SASS 縫隙裡——GPU binary splicing、dead register 再利用、hazard table 共用，與用 1% overhead 重現 FlashAttention-3 的優化軌跡": articles/xtrace-gpu-binary-splicing-dead-register-hazard-table-flashattention-h100-b300-mi300x-2026.md
     - "EdgeAgent：Apple M4 上跑多 Agent LLM，為什麼要繞過 graph compiler？——UMA 零拷貝張量平行、ARM SME 微核心、Tool Stall 掛起機制": articles/edgeagent-uma-tensor-parallel-graph-compiler-bypass-arm-sme-tool-stall-m4-2026.md
     - "GraCE — 當 CUDA Graph 的三個隱疾被編譯器一次處理掉：OSDI'26 PyTorch2 延伸的一次完整示範": articles/grace-cuda-graphs-pytorch2-compiler-parameter-indirection-selective-osdi2026.md
