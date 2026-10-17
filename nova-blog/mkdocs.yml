@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "Rubin 不會自動繼承 Blackwell 的 FP8 Core Math：從 PTX ISA 9.4 讀 sm_107 的 compiler backend 邊界": articles/rubin-sm107-ptx94-fp8-core-math-not-forward-compat-cuda134-compiler-backend-2026.md
     - "KernelLens 4 階段編譯器：Triton @triton.jit 到 ONNX Runtime / TensorRT C++ plugin 的最後一哩路（2026-10-16）": articles/kernellens-4phase-triton-onnx-tensorrt-cpp-plugin-boundary-compiler-2026.md
     - "MLIR 78、Triton Dev Conf 與 TensorRT 11：AI compiler stack 的技術債償還季（2026-10-15）": articles/mlir78-strict-property-rocdl-targetinfo-tensorrt11-strongly-typed-compiler-debt-payback-2026.md
     - "Xtrace：把 probe 塞進 compiler 已經排好的 SASS 縫隙裡——GPU binary splicing、dead register 再利用、hazard table 共用，與用 1% overhead 重現 FlashAttention-3 的優化軌跡": articles/xtrace-gpu-binary-splicing-dead-register-hazard-table-flashattention-h100-b300-mi300x-2026.md
