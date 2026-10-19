@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "FP4 GEMM 快 2 倍、整段 encoder 卻慢 24%：TensorRT 11.4 NVFP4 fusion 回歸的 Myelin 層根因分析（Blackwell SM120, 2026-10）": articles/trt114-nvfp4-fusion-regression-myelin-bge-reranker-blackwell-sm120-2026.md
     - "TensorRT 11.4 把 CUDA Green Contexts 搬進 inference compiler 的設計面：SM 分區、work-queue 顯式化、false serialization 的終局": articles/trt114-cuda-green-contexts-sm-partitioning-false-serialization-compiler-boundary-2026.md
     - "Rubin 不會自動繼承 Blackwell 的 FP8 Core Math：從 PTX ISA 9.4 讀 sm_107 的 compiler backend 邊界": articles/rubin-sm107-ptx94-fp8-core-math-not-forward-compat-cuda134-compiler-backend-2026.md
     - "KernelLens 4 階段編譯器：Triton @triton.jit 到 ONNX Runtime / TensorRT C++ plugin 的最後一哩路（2026-10-16）": articles/kernellens-4phase-triton-onnx-tensorrt-cpp-plugin-boundary-compiler-2026.md
