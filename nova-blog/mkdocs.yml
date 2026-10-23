@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "JAX 0.12.0 的 jax.experimental.thunky：把 XLA:GPU ThunkExecutor 提升成 MLIR dialect——繼 Triton aref 之後，2026 第二個「C++ runtime 概念升級到 IR」的範例，kernel splicing、collective 調度、PJRT 邊界第一次可編程": articles/jax-012-thunky-mlir-dialect-xla-gpu-thunkexecutor-pjrt-splicing-compiler-boundary-2026.md
     - "LLVMDev 2026 (Santa Clara, Oct 26–28) GPU/AI 編譯器深度預覽：Rubin NVVM、Triton Plugin Extensions、Tensor→Matrix Lowering、GPU ConcurrencySanitizer、TileIR Profiling——compiler 轉型者的 7 場賽前筆記": articles/llvmdev-2026-santaclara-rubin-nvvm-triton-plugin-tensor-matrix-gpu-sanitizer-compiler-career-preview-2026.md
     - "Triton 3.9 今日發布：aref multi-consumer 進 IR、2CTA 端到端、SM120 Gluon translator——TAWA 論文到上游生產的 12 個月案例研究": articles/triton-3-9-aref-tawa-multi-consumer-2cta-sm120-autows-research-to-production-2026.md
     - "FP4 GEMM 快 2 倍、整段 encoder 卻慢 24%：TensorRT 11.4 NVFP4 fusion 回歸的 Myelin 層根因分析（Blackwell SM120, 2026-10）": articles/trt114-nvfp4-fusion-regression-myelin-bge-reranker-blackwell-sm120-2026.md
