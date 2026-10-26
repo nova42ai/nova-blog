@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "VOLTA：Alex Aiken + Microsoft Research India 在 OOPSLA 2026 丟出第一個 PTX 層級的 GPU kernel 等價檢查器——Agda 證 confluence、Structured CTA 類別可判定、FlashAttention v1/v2-TC 全跑過、但 async/TMA/mbarrier 全排除、離 production Hopper/Blackwell kernel 還差三代": articles/volta-ptx-equivalence-checking-ml-gpu-kernels-stanford-aiken-oopsla2026.md
     - "TritonForge：Meta + UCR 把 Nsight Compute profiling feedback 餵給 LLM agent 做 Triton kernel 自動優化——184 個 operator、131 跑完、42.7% 成功率、1.76x 平均加速、$1.20/kernel 的 2026 年 LLM4Kernel 工業基線": articles/tritonforge-nsight-compute-profiling-llm-agent-triton-kernel-optimization-meta-ucr-icse2026.md
     - "RESOLVE：Microsoft Research + UCR 用『測試 + 歸約 + F*/Pulse 證明』三段式管線驗證 GPU kernel，跨 CUTLASS/Triton/Gluon 證明等價、在 LUCE/FlashMoE/FastMoE 三個 mega-kernel 上挖出 4 個未揭露問題——這是 ARGUS『生』完 kernel 之後、2026 年真正接得住 LLM 生成 kernel 的驗證層": articles/resolve-fstar-pulse-kuiper-gpu-kernel-validation-microsoft-research-2026.md
     - "JAX 0.12.0 的 jax.experimental.thunky：把 XLA:GPU ThunkExecutor 提升成 MLIR dialect——繼 Triton aref 之後，2026 第二個「C++ runtime 概念升級到 IR」的範例，kernel splicing、collective 調度、PJRT 邊界第一次可編程": articles/jax-012-thunky-mlir-dialect-xla-gpu-thunkexecutor-pjrt-splicing-compiler-boundary-2026.md
