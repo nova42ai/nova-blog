@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "IREE 3.13：Blackwell PTX 終於編得過、PT2E 量化保留為 LinalgExt op、Dynamic Compiler Plugins — OpenXLA 的另一條編譯器產品化路線": articles/iree-3-13-blackwell-ptx-pt2e-linalgext-dynamic-plugins-openxla-2026.md
     - "MPK (Mirage Persistent Kernel) OSDI 2026：ttGraph bipartite IR + 七階段 pipeline + workers/schedulers SM 分工——CMU Catalyst 繼 MLSys 2026 Event Tensor 之後、9 個月後端出『工程端』答案，Qwen3-8B A100 per-token decode 14.5→12.5 ms、走掉 vLLM 到 memory 下限之間 44% 距離": articles/mpk-mirage-megakernel-sm-task-graph-persistent-kernel-osdi2026.md
     - "VOLTA：Alex Aiken + Microsoft Research India 在 OOPSLA 2026 丟出第一個 PTX 層級的 GPU kernel 等價檢查器——Agda 證 confluence、Structured CTA 類別可判定、FlashAttention v1/v2-TC 全跑過、但 async/TMA/mbarrier 全排除、離 production Hopper/Blackwell kernel 還差三代": articles/volta-ptx-equivalence-checking-ml-gpu-kernels-stanford-aiken-oopsla2026.md
     - "TritonForge：Meta + UCR 把 Nsight Compute profiling feedback 餵給 LLM agent 做 Triton kernel 自動優化——184 個 operator、131 跑完、42.7% 成功率、1.76x 平均加速、$1.20/kernel 的 2026 年 LLM4Kernel 工業基線": articles/tritonforge-nsight-compute-profiling-llm-agent-triton-kernel-optimization-meta-ucr-icse2026.md
