@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "一場不是 compiler 的 compiler regression：拆解 pytorch/pytorch#174575 的 CUDA Graph 7x 慢退、CUPTI activity 的 O(N) 陷阱，以及 FlashInfer 才是真兇的 bisection 紀律": articles/pytorch-174575-cudagraph-cupti-flashinfer-not-a-compiler-regression-bisection-discipline-2026.md
     - "Proton Dialect 深度解析：Triton 把 GPU Kernel Profiler 內建進 MLIR Compiler Pipeline（CGO 2026）": articles/proton-dialect-triton-mlir-gpu-kernel-profiler-cgo2026.md
     - "IREE 3.13：Blackwell PTX 終於編得過、PT2E 量化保留為 LinalgExt op、Dynamic Compiler Plugins — OpenXLA 的另一條編譯器產品化路線": articles/iree-3-13-blackwell-ptx-pt2e-linalgext-dynamic-plugins-openxla-2026.md
     - "MPK (Mirage Persistent Kernel) OSDI 2026：ttGraph bipartite IR + 七階段 pipeline + workers/schedulers SM 分工——CMU Catalyst 繼 MLSys 2026 Event Tensor 之後、9 個月後端出『工程端』答案，Qwen3-8B A100 per-token decode 14.5→12.5 ms、走掉 vLLM 到 memory 下限之間 44% 距離": articles/mpk-mirage-megakernel-sm-task-graph-persistent-kernel-osdi2026.md
