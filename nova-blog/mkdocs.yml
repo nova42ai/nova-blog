@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "Mojo 1.2：Pattern Matching、comptime match、TargetAccelerator、Metal AIR bitcode、jemalloc 編譯加速——Lattner 班底的 compiler 產品化第二節": articles/mojo-1-2-pattern-matching-comptime-match-target-accelerator-metal-air-jemalloc-2026.md
     - "GraCE：OSDI 2026 把 CUDA Graph 徹底『編譯器化』——TorchDynamo / TorchInductor / Triton LLVM pass 三層聯動的實作考據": articles/grace-osdi2026-cuda-graph-compiler-torchinductor-parameter-indirection-selective-deployment-2026.md
     - "一場不是 compiler 的 compiler regression：拆解 pytorch/pytorch#174575 的 CUDA Graph 7x 慢退、CUPTI activity 的 O(N) 陷阱，以及 FlashInfer 才是真兇的 bisection 紀律": articles/pytorch-174575-cudagraph-cupti-flashinfer-not-a-compiler-regression-bisection-discipline-2026.md
     - "Proton Dialect 深度解析：Triton 把 GPU Kernel Profiler 內建進 MLIR Compiler Pipeline（CGO 2026）": articles/proton-dialect-triton-mlir-gpu-kernel-profiler-cgo2026.md
