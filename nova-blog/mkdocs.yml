@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "Fireworks MSA / Blackwell Kernel：KV-stationary 把 FlashInfer 甩開 2.4× 的全解——nsb/N < 2.85 roofline、tcgen05 + TMA + warp-specialization 分工、以及為什麼 torch.compile 寫不出這顆 kernel": articles/fireworks-m3-msa-kv-outer-blackwell-sm100-warp-specialization-cute-dsl-2026.md
     - "KernelOPT vs STARK：LLM 寫 GPU Kernel 的兩條路線在 2026 Q4 正面對撞——「保留 cuBLAS 只打 Triton」的手術刀派 vs「Plan/Code/Debug 多智能體從零改寫」的樂隊派": articles/kernelopt-vs-stark-dispatch-aware-multi-agent-llm-kernel-2026.md
     - "Mojo 1.2：Pattern Matching、comptime match、TargetAccelerator、Metal AIR bitcode、jemalloc 編譯加速——Lattner 班底的 compiler 產品化第二節": articles/mojo-1-2-pattern-matching-comptime-match-target-accelerator-metal-air-jemalloc-2026.md
     - "GraCE：OSDI 2026 把 CUDA Graph 徹底『編譯器化』——TorchDynamo / TorchInductor / Triton LLVM pass 三層聯動的實作考據": articles/grace-osdi2026-cuda-graph-compiler-torchinductor-parameter-indirection-selective-deployment-2026.md
