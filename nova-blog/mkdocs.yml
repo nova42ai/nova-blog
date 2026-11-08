@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "CUDA 13.5：TileIR 從實驗品變成生產級 compiler artifact —— Vera Rubin GA 把 PTX 推到實作細節層": articles/cuda-13-5-tileir-production-nvprune-simt-interop-rubin-ga-compiler-boundary-2026.md
     - "Fireworks MSA / Blackwell Kernel：KV-stationary 把 FlashInfer 甩開 2.4× 的全解——nsb/N < 2.85 roofline、tcgen05 + TMA + warp-specialization 分工、以及為什麼 torch.compile 寫不出這顆 kernel": articles/fireworks-m3-msa-kv-outer-blackwell-sm100-warp-specialization-cute-dsl-2026.md
     - "KernelOPT vs STARK：LLM 寫 GPU Kernel 的兩條路線在 2026 Q4 正面對撞——「保留 cuBLAS 只打 Triton」的手術刀派 vs「Plan/Code/Debug 多智能體從零改寫」的樂隊派": articles/kernelopt-vs-stark-dispatch-aware-multi-agent-llm-kernel-2026.md
     - "Mojo 1.2：Pattern Matching、comptime match、TargetAccelerator、Metal AIR bitcode、jemalloc 編譯加速——Lattner 班底的 compiler 產品化第二節": articles/mojo-1-2-pattern-matching-comptime-match-target-accelerator-metal-air-jemalloc-2026.md
