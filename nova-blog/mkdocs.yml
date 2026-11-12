@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "HIERA：LLM 寫 GPU Kernel 的第三波——SJTU 把『選搜尋空間』提到決策層，用 3-agent + contract-augmented spec 攻 KernelBench 的『實現有效性』這個被 KernelOPT/STARK 共同留下的缺口": articles/hiera-search-space-decision-agent-contract-augmented-spec-llm-gpu-kernel-2026.md
     - "PyTorch 2.15 NVGEMM 低精度 Decode 升級：Scalar Dequant Fusion、Shape-Aware Policy 與 PDL 重寫編譯邊界": articles/pytorch-2-15-nvgemm-nvfp4-decode-scalar-dequant-pdl-shape-policy-flydsl-mi450-2026.md
     - "Spira (MLSys 2026)：第一個「體素屬性感知」的 Sparse Convolution GPU 引擎——把 kernel map 的 pre-processing 砍到 0": articles/spira-mlsys2026-voxel-property-aware-sparse-convolution-point-cloud-gpu-2026.md
     - "CUDA 13.5：TileIR 從實驗品變成生產級 compiler artifact —— Vera Rubin GA 把 PTX 推到實作細節層": articles/cuda-13-5-tileir-production-nvprune-simt-interop-rubin-ga-compiler-boundary-2026.md
