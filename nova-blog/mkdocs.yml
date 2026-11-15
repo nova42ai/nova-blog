@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "Triton 3.9 的 atomic_load / atomic_store / poll：把記憶體模型從『碰運氣的 fence 嵌入』升到 C++20 子集，CTA barrier 的放置回到 compiler 決定": articles/triton-39-atomic-load-store-poll-memory-model-cta-barrier-2026.md
     - "Neptune (PLDI 2026)：UIUC + IBM 把 reduction 的 loop-carried dependency 當成可代數修補的障礙——compiler 從 tensor expression 自動 lower 出 FlashAttention (prefill) 跟 FlashDecoding (decode) 兩套形狀，10 個 attention operator × 4 張 NVIDIA/AMD GPU geomean 1.35x、peak NVIDIA 2.65x / AMD 3.32x": articles/neptune-pldi2026-reduction-fusion-algebraic-repair-flashattention-flashdecoding-uiuc-ibm-2026.md
     - "HIERA：LLM 寫 GPU Kernel 的第三波——SJTU 把『選搜尋空間』提到決策層，用 3-agent + contract-augmented spec 攻 KernelBench 的『實現有效性』這個被 KernelOPT/STARK 共同留下的缺口": articles/hiera-search-space-decision-agent-contract-augmented-spec-llm-gpu-kernel-2026.md
     - "PyTorch 2.15 NVGEMM 低精度 Decode 升級：Scalar Dequant Fusion、Shape-Aware Policy 與 PDL 重寫編譯邊界": articles/pytorch-2-15-nvgemm-nvfp4-decode-scalar-dequant-pdl-shape-policy-flydsl-mi450-2026.md
