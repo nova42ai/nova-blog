@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "MLIR 79 期電報：Pass 平行 6.4x、isOpTriviallyDead 84x、Logical Sharding、arith.select 直接幫 Triton 省時間（2026-11-16）": articles/mlir79-pass-infra-6x-logical-sharding-arith-select-triton-greedy-rewriter-84x-2026.md
     - "從 6 個月到 3 天：Anthropic AMD port、IREE 3.14、Tenstorrent tt-mlir — CUDA moat 真的在漏水嗎？(2026-11-17)": articles/cuda-moat-draining-anthropic-amd-3-days-iree-tenstorrent-mlir-triton-compiler-2026.md
     - "`--fp16` 被砍：TensorRT 11 把「精度決策」從 backend compiler 推回到前端 ONNX graph —— ModelOpt AutoCast 是新的 frontend（2026-11-16）": articles/tensorrt-11-weak-typing-death-modelopt-autocast-compiler-boundary-upstream-shift-2026.md
     - "Triton 3.9 的 atomic_load / atomic_store / poll：把記憶體模型從『碰運氣的 fence 嵌入』升到 C++20 子集，CTA barrier 的放置回到 compiler 決定": articles/triton-39-atomic-load-store-poll-memory-model-cta-barrier-2026.md
