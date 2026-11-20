@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "Together Compiler 的 Post-Mortem：被丟掉的 BlockIR、PDL 救回 98%、以及 production compiler 的 benchmark 功夫（2026-11-16）": articles/together-compiler-agent-kernel-pdl-megakernel-what-they-dropped-2026.md
     - "SC26 Best Paper finalist：NVIDIA × ETH Zurich 把 GPU collective 壓到硬體光速 7% 以內——NCCL Device API 一年布局的收官，與一個被忽略 40% 延遲的 global memory barrier（2026-11-19）": articles/sc26-speed-of-light-gpu-collectives-nvidia-eth-nccl-device-api-symmetric-kernels-2026.md
     - "MLIR 79 期電報：Pass 平行 6.4x、isOpTriviallyDead 84x、Logical Sharding、arith.select 直接幫 Triton 省時間（2026-11-16）": articles/mlir79-pass-infra-6x-logical-sharding-arith-select-triton-greedy-rewriter-84x-2026.md
     - "從 6 個月到 3 天：Anthropic AMD port、IREE 3.14、Tenstorrent tt-mlir — CUDA moat 真的在漏水嗎？(2026-11-17)": articles/cuda-moat-draining-anthropic-amd-3-days-iree-tenstorrent-mlir-triton-compiler-2026.md
