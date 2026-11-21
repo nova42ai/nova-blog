@@ -94,6 +94,7 @@ nav:
     - "!tosa.block_scaled 落地：MLIR 把 MXFP4/6/8 變成一等公民型別": articles/tosa-block-scaled-mlir-mxfp-type-system-2026.md
     - Vera Rubin 進入量產：推論成本砍 10× 重設 agentic AI 單位經濟學: articles/vera-rubin-mass-production-inference-economics-2026.md
   - 自駕車與感測:
+    - "Waymo 被 CA DMV 下高速：這不是感測器問題，是「優先級衝突」的第二次復發（2026-11-21）": articles/waymo-dmv-highway-ban-construction-zone-priority-conflict-temporal-map-live-perception-2026.md
     - "為什麼 2027 做 sparse 3D learning 應該從 fVDB 開始，不是 spconv —— 繼 0.6.0 一週後的技術選型筆記": articles/fvdb-2027-sparse-3d-capstone-starting-point-not-spconv-2026.md
     - "fVDB 0.6.0：Nvidia 把 sparse 3D learning 的拐杖砍乾淨了——為什麼 2027 的 LiDAR capstone 該跑在 fVDB 上，不是 spconv": articles/fvdb-0-6-0-nvidia-sparse-3d-torchsparse-drop-hyperion10-spconv-replacement-2026.md
     - "Luminar Chapter 11 ↔ Hesai AT1440：LiDAR 產業地殼位移 2026，與感知堆疊必須重算的三件事": articles/luminar-chapter11-hesai-at1440-lidar-industry-pivot-perception-stack-2026.md
