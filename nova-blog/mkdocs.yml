@@ -153,6 +153,7 @@ nav:
     - Embodiment Gap：TMLR 21 個方法群沒有一個歸類到 safety/recovery: articles/embodiment-gap-robot-foundation-models-safety-recovery-blind-spot-2026.md
     - 從 ISO 26262 到 ISO 13849：NVIDIA Halos for Robotics 把功能安全整包搬進物理 AI: articles/nvidia-halos-robotics-functional-safety-2026.md
   - VLA 與機器人學習:
+    - "AIRoA-0：日本 METI 把 VLA 的資料瓶頸直接繞過去——手持夾爪、無機器人資料、78% 全贏 pi0.5 家族（2026-11-23）": articles/airoa-0-japan-handheld-data-pi05-visual-budget-cross-embodiment-vla-open-2026.md
     - "從 VLA 到 PLA：NEURA Neuron AI 加上觸覺、聲音、記憶之後，on-device 多模態融合的系統成本在哪裡？（2026-10）": articles/neuron-ai-pla-vs-vla-neura-tactile-audio-memory-fusion-2026.md
     - "ActTune：VLA 的真正能量帳是『每個成功任務』—動作感知混合精度 × GPU DVFS 砍到 76.8% 能耗怎麼做到的": articles/acttune-vla-energy-per-success-action-aware-precision-dvfs-libero-2026.md
     - "HarnessPAI：ByteDance Seed 把 code 當成 Physical AI 的 IR，LIBERO-PRO 從 34.9% 衝到 96.5%": articles/harnesspai-code-as-ir-pi05-worlddreamer-libero-pro-bytedance-seed-2026.md
