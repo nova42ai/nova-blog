@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "Triton #12888 — `CombineBroadcastMulReducePattern` 在 f16/bf16 上的 verifier crash：一行 `isAddF32` 引發的 type-propagation 事故（2026-11-24）": articles/triton-12888-combine-broadcast-mul-reduce-f16-bf16-verifier-crash-2026.md
     - "Meta 把 Triton 撕開一層：TLX、MIMW 模型、以及 compiler boundary 往下搬一階的信號（2026-11-10）": articles/tlx-mimw-triton-extensions-meta-ucsd-warp-group-cluster-blackwell-cdna4-utlx-2026.md
     - "Together Compiler 的 Post-Mortem：被丟掉的 BlockIR、PDL 救回 98%、以及 production compiler 的 benchmark 功夫（2026-11-16）": articles/together-compiler-agent-kernel-pdl-megakernel-what-they-dropped-2026.md
     - "SC26 Best Paper finalist：NVIDIA × ETH Zurich 把 GPU collective 壓到硬體光速 7% 以內——NCCL Device API 一年布局的收官，與一個被忽略 40% 延遲的 global memory barrier（2026-11-19）": articles/sc26-speed-of-light-gpu-collectives-nvidia-eth-nccl-device-api-symmetric-kernels-2026.md
