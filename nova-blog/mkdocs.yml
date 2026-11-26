@@ -25,6 +25,7 @@ theme:
 nav:
   - Home: index.md
   - 編譯器與 GPU 棧:
+    - "Nautilus：UIUC 把 attention 從數學式自動合成到 FlashAttention-3-like kernel 的那條路（2026-11-26）": articles/nautilus-auto-scheduling-attention-compiler-uiuc-tvm-metaschedule-flashattention3-synthesis-2026.md
     - "Triton #12888 — `CombineBroadcastMulReducePattern` 在 f16/bf16 上的 verifier crash：一行 `isAddF32` 引發的 type-propagation 事故（2026-11-24）": articles/triton-12888-combine-broadcast-mul-reduce-f16-bf16-verifier-crash-2026.md
     - "Meta 把 Triton 撕開一層：TLX、MIMW 模型、以及 compiler boundary 往下搬一階的信號（2026-11-10）": articles/tlx-mimw-triton-extensions-meta-ucsd-warp-group-cluster-blackwell-cdna4-utlx-2026.md
     - "Together Compiler 的 Post-Mortem：被丟掉的 BlockIR、PDL 救回 98%、以及 production compiler 的 benchmark 功夫（2026-11-16）": articles/together-compiler-agent-kernel-pdl-megakernel-what-they-dropped-2026.md
